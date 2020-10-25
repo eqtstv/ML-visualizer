@@ -17,7 +17,7 @@ df = pd.DataFrame(
 )
 
 fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
-Bfig["layout"]["template"] = "plotly_dark"
+fig["layout"]["template"] = "plotly_dark"
 
 app.layout = dbc.Container(
     html.Div(
