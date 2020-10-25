@@ -3,20 +3,17 @@ import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import plotly.express as px
+import plotly.graph_objs as go
 import pandas as pd
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-df = pd.DataFrame(
-    {
-        "Fruit": ["Apples", "Oranges", "Bananas", "Apples", "Oranges", "Bananas"],
-        "Amount": [4, 1, 2, 2, 4, 5],
-        "City": ["SF", "SF", "SF", "Montreal", "Montreal", "Montreal"],
-    }
-)
 
-fig = px.bar(df, x="Fruit", y="Amount", color="City", barmode="group")
+df = pd.read_csv("data/stockdata2.csv")
+df = df.loc[df["stock"] == "AAPL"]
+
+fig = px.line(df, x="Date", y="value", title="AAPL")
 fig["layout"]["template"] = "plotly_dark"
 
 app.layout = dbc.Container(
