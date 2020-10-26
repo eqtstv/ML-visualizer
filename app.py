@@ -9,12 +9,42 @@ import pandas as pd
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
-
 df = pd.read_csv("data/stockdata2.csv")
-df = df.loc[df["stock"] == "AAPL"]
+df1 = df.loc[df["stock"] == "AAPL"]
+df2 = df.loc[df["stock"] == "MSFT"]
 
-fig = px.line(df, x="Date", y="value", title="AAPL")
-fig["layout"]["template"] = "plotly_dark"
+
+def update_graph(df, graph_id, graph_title):
+
+    trace_train = go.Scatter(
+        x=df1["Date"],
+        y=df1["value"],
+        mode="lines",
+        name="Training",
+        showlegend=True,
+    )
+
+    trace_val = go.Scatter(
+        x=df2["Date"],
+        y=df2["value"],
+        mode="lines",
+        name="Validation",
+        showlegend=True,
+    )
+
+    layout = go.Layout(template="plotly_dark", title_text=graph_title)
+    figure = go.Figure(data=[trace_train, trace_val], layout=layout)
+
+    return dcc.Graph(
+        id=graph_id,
+        className="chart-graph",
+        config={
+            "displayModeBar": False,
+            "scrollZoom": True,
+        },
+        figure=figure,
+    )
+
 
 app.layout = dbc.Container(
     html.Div(
@@ -50,23 +80,21 @@ app.layout = dbc.Container(
                         dbc.Row(
                             html.Div(
                                 children=[
-                                    dcc.Graph(
-                                        id="example-graph-2",
+                                    update_graph(df1, "graph1", "AAPL"),
+                                    update_graph(df2, "graph2", "Microsoft"),
+                                    html.Div(
+                                        children=[
+                                            html.P(f"Training: {df1.value.iloc[-1]}"),
+                                            html.P(f"Validation: {df1.value.iloc[1]}"),
+                                        ],
                                         className="chart-graph",
-                                        config={
-                                            "displayModeBar": False,
-                                            "scrollZoom": True,
-                                        },
-                                        figure=fig,
                                     ),
-                                    dcc.Graph(
-                                        id="example-graph-3",
+                                    html.Div(
+                                        children=[
+                                            html.P(f"Training: {df2.value.iloc[-1]}"),
+                                            html.P(f"Validation: {df2.value.iloc[1]}"),
+                                        ],
                                         className="chart-graph",
-                                        config={
-                                            "displayModeBar": False,
-                                            "scrollZoom": True,
-                                        },
-                                        figure=fig,
                                     ),
                                 ],
                                 className="graphs-frame",
