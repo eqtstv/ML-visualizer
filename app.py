@@ -84,15 +84,23 @@ app.layout = dbc.Container(
                                     update_graph(df2, "graph2", "Microsoft"),
                                     html.Div(
                                         children=[
-                                            html.P(f"Training: {df1.value.iloc[-1]}"),
-                                            html.P(f"Validation: {df1.value.iloc[1]}"),
+                                            html.P(
+                                                f"Training: {df1.value.iloc[-1]:.4f}"
+                                            ),
+                                            html.P(
+                                                f"Validation: {df1.value.iloc[1]:.4f}"
+                                            ),
                                         ],
                                         className="chart-graph",
                                     ),
                                     html.Div(
                                         children=[
-                                            html.P(f"Training: {df2.value.iloc[-1]}"),
-                                            html.P(f"Validation: {df2.value.iloc[1]}"),
+                                            html.P(
+                                                f"Training: {df2.value.iloc[-1]:.4f}"
+                                            ),
+                                            html.P(
+                                                f"Validation: {df2.value.iloc[1]:.4f}"
+                                            ),
                                         ],
                                         className="chart-graph",
                                     ),
