@@ -529,6 +529,12 @@ body {
   width: 45%;
 }
 
+.chart-stats {
+  margin: 10px;
+  display: inline-block;
+  width: 45%;
+}
+
 .react-entry-point {
   height: 100vh;
 }
