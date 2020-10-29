@@ -557,7 +557,9 @@ h5 {
   background-color: #1d1d1d;
 }
 
-.row {
+#title {
+  margin-left: 3%;
+  margin-top: 1%;
 }
 
 p {
