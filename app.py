@@ -130,95 +130,42 @@ app.layout = dbc.Container(
                                             className="chart-graph",
                                         ),
                                         html.Div(
-                                            id="div-current-accuracy-value",
-                                            className="chart-stats",
-                                        ),
-                                        html.Div(
-                                            id="div-current-loss-value",
-                                            className="chart-stats",
+                                            children=[
+                                                html.Div(
+                                                    id="div-current-accuracy-value",
+                                                    className="chart-stats",
+                                                ),
+                                                html.Div(
+                                                    className="chart-stats",
+                                                    id="div-interval-control",
+                                                    children=[
+                                                        html.Div(
+                                                            id="div-step-display",
+                                                        ),
+                                                    ],
+                                                ),
+                                                html.Div(
+                                                    id="div-current-loss-value",
+                                                    className="chart-stats",
+                                                ),
+                                            ],
+                                            className="div-graphs-stats",
                                         ),
                                     ],
                                     className="graphs-frame",
-                                ),
-                                dcc.Dropdown(
-                                    id="dropdown-demo-dataset",
-                                    options=[
-                                        {
-                                            "label": "CIFAR 10",
-                                            "value": "cifar",
-                                        },
-                                        {
-                                            "label": "MNIST",
-                                            "value": "mnist",
-                                        },
-                                        {
-                                            "label": "Fashion MNIST",
-                                            "value": "fashion",
-                                        },
-                                    ],
-                                    value="mnist",
-                                    placeholder="Select a demo dataset",
-                                    searchable=False,
-                                ),
-                                html.Div(
-                                    dcc.Dropdown(
-                                        id="dropdown-simulation-model",
-                                        options=[
-                                            {
-                                                "label": "1-Layer Neural Net",
-                                                "value": "softmax",
-                                            },
-                                            {
-                                                "label": "Simple Conv Net",
-                                                "value": "cnn",
-                                            },
-                                        ],
-                                        value="cnn",
-                                        placeholder="Select Model to Simulate",
-                                        searchable=False,
-                                    ),
-                                    className="six columns dropdown-box-second",
                                 ),
                                 html.Div(
                                     dcc.Dropdown(
                                         id="dropdown-interval-control",
                                         options=[
                                             {
-                                                "label": "No Updates",
-                                                "value": "no",
-                                            },
-                                            {
-                                                "label": "Slow Updates",
-                                                "value": "slow",
-                                            },
-                                            {
-                                                "label": "Regular Updates",
-                                                "value": "regular",
-                                            },
-                                            {
                                                 "label": "Fast Updates",
                                                 "value": "fast",
                                             },
                                         ],
-                                        value="regular",
-                                        className="twelve columns dropdown-box-third",
-                                        clearable=False,
-                                        searchable=False,
+                                        value="fast",
+                                        style={"display": "none"},
                                     )
-                                ),
-                                html.Div(
-                                    className="four columns",
-                                    id="div-interval-control",
-                                    children=[
-                                        html.Div(
-                                            id="div-total-step-count",
-                                            className="twelve columns",
-                                        ),
-                                        html.Div(
-                                            id="div-step-display",
-                                            className="twelve columns",
-                                        ),
-                                    ],
                                 ),
                             ]
                         ),
@@ -282,6 +229,17 @@ def get_run_log(_):
         return None
 
     return json
+
+
+@app.callback(
+    Output("div-step-display", "children"), [Input("run-log-storage", "data")]
+)
+def update_div_step_display(run_log_json):
+    if run_log_json:
+        run_log_df = pd.read_json(run_log_json, orient="split")
+        return html.H6(
+            f"Step: {run_log_df['step'].iloc[-1]}",
+        )
 
 
 @app.callback(

@@ -29,40 +29,6 @@ class LossAndAccToCsvCallback(keras.callbacks.Callback):
             )
 
 
-def write_data_simple(
-    step,
-    train_loss,
-    train_accuracy,
-    test_loss,
-    test_accuracy,
-    filename="run_log.csv",
-):
-
-    if step == "1":
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
-
-    # Write CSV
-    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerow(
-            [
-                step,
-                train_accuracy,
-                train_loss,
-                test_accuracy,
-                test_loss,
-            ]
-        )
-
-    return (
-        train_accuracy,
-        train_loss,
-        test_accuracy,
-        test_loss,
-    )
-
-
 def write_data_train(
     step,
     train_loss,
@@ -116,6 +82,40 @@ def write_data_val(
     return (
         val_accuracy,
         val_loss,
+    )
+
+
+def write_data_simple(
+    step,
+    train_loss,
+    train_accuracy,
+    test_loss,
+    test_accuracy,
+    filename="run_log.csv",
+):
+
+    if step == "1":
+        if os.path.exists(f"{LOGS_PATH}/{filename}"):
+            os.remove(f"{LOGS_PATH}/{filename}")
+
+    # Write CSV
+    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
+        writer = csv.writer(file, delimiter=",")
+        writer.writerow(
+            [
+                step,
+                train_accuracy,
+                train_loss,
+                test_accuracy,
+                test_loss,
+            ]
+        )
+
+    return (
+        train_accuracy,
+        train_loss,
+        test_accuracy,
+        test_loss,
     )
 
 
