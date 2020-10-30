@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 sys.path.insert(0, "..")
-from tfutils import LossAndAccToCsvCallback
+from utils.tfutils import LossAndAccToCsvCallback
 
 fashion_mnist = tf.keras.datasets.fashion_mnist
 

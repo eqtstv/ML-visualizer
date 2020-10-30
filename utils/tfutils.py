@@ -5,7 +5,7 @@ import csv
 import os
 import sys
 
-LOGS_PATH = pathlib.Path(__file__).parent.joinpath("logs").resolve()
+LOGS_PATH = pathlib.Path(__file__).parent.parent.joinpath("logs").resolve()
 
 
 class LossAndAccToCsvCallback(keras.callbacks.Callback):
