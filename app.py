@@ -75,6 +75,20 @@ def update_graph(
             title_text=graph_title,
         )
         figure = go.Figure(data=[trace_train, trace_val], layout=layout)
+        figure.update_yaxes(
+            range=[max(y_train[-1] - 0.1, -0.01), min(y_train[-1] + 0.1, 1.01)]
+        )
+        figure.update_xaxes(range=[0, step.iloc[-1] * 1.1])
+        figure.add_shape(
+            type="line",
+            x0=0,
+            y0=y_train[-1],
+            x1=step.iloc[-1] * 1.1,
+            y1=y_train[-1],
+            line=dict(color="blue", dash="dot", width=1),
+            xref="x",
+            yref="y",
+        )
 
         return dcc.Graph(
             id=graph_id,
