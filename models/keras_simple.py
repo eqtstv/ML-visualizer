@@ -1,12 +1,13 @@
 # TensorFlow and tf.keras
 import tensorflow as tf
 from tensorflow import keras
-import sys
+
 
 
 import numpy as np
 import matplotlib.pyplot as plt
 
+import sys
 sys.path.insert(0, "..")
 from utils.tfutils import LossAndAccToCsvCallback
 

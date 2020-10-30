@@ -74,12 +74,17 @@ def update_graph(
             template="plotly_dark",
             title_text=graph_title,
         )
-        figure = go.Figure(data=[trace_train, trace_val], layout=layout)
-        figure.update_yaxes(
-            range=[max(y_train[-1] - 0.1, -0.01), min(y_train[-1] + 0.1, 1.01)]
+
+        fig = go.Figure(data=[trace_train, trace_val], layout=layout)
+
+        fig.update_xaxes(range=[0, step.iloc[-1] * 1.1])
+        fig.update_yaxes(
+            range=[
+                max(min(y_train[-10:-1]) - 0.1, -0.01),
+                y_train[-1] + 0.1,
+            ]
         )
-        figure.update_xaxes(range=[0, step.iloc[-1] * 1.1])
-        figure.add_shape(
+        fig.add_shape(
             type="line",
             x0=0,
             y0=y_train[-1],
@@ -89,6 +94,44 @@ def update_graph(
             xref="x",
             yref="y",
         )
+        fig.add_annotation(
+            x=0,
+            y=y_train[-1],
+            text=f"{y_train[-1]:.4f}",
+            showarrow=False,
+            yshift=11,
+            xshift=22,
+            font=dict(),
+            bgcolor="rgb(50,50,150)",
+        )
+
+        if not y_val.empty:
+            fig.update_yaxes(
+                range=[
+                    max(min(y_train[-1], y_val.iloc[-1]) - 0.1, -0.01),
+                    min(max(y_train[-1], y_val.iloc[-1]) + 0.1, 1.01),
+                ]
+            )
+            fig.add_shape(
+                type="line",
+                x0=0,
+                y0=y_val.iloc[-1],
+                x1=step.iloc[-1] * 1.1,
+                y1=y_val.iloc[-1],
+                line=dict(color="red", dash="dot", width=1),
+                xref="x",
+                yref="y",
+            )
+            fig.add_annotation(
+                x=0,
+                y=y_val.iloc[-1],
+                text=f"{y_val.iloc[-1]:.4f}",
+                showarrow=False,
+                yshift=-11,
+                xshift=22,
+                font=dict(),
+                bgcolor="rgb(150,50,50)",
+            )
 
         return dcc.Graph(
             id=graph_id,
@@ -96,7 +139,7 @@ def update_graph(
                 "displayModeBar": False,
                 "scrollZoom": True,
             },
-            figure=figure,
+            figure=fig,
         )
     return dcc.Graph(id=graph_id)
 
