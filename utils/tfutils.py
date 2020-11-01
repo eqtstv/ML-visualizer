@@ -4,15 +4,26 @@ import pathlib
 import csv
 import os
 import sys
+import json
 
 LOGS_PATH = pathlib.Path(__file__).parent.parent.joinpath("logs").resolve()
+
+BATCH_SPLIT = 28
+
+no_steps = 0
 
 
 class LossAndAccToCsvCallback(keras.callbacks.Callback):
     step = 0
 
+    def on_train_begin(self, logs=None):
+        global no_steps
+        no_steps = self.params["steps"]
+        get_model_params(self.params)
+        get_model_summary(self.model)
+
     def on_train_batch_end(self, batch, logs=None):
-        if batch % 28 == 0:
+        if batch % BATCH_SPLIT == 0:
             write_data_train(
                 self.step,
                 logs["loss"],
@@ -27,6 +38,18 @@ class LossAndAccToCsvCallback(keras.callbacks.Callback):
                 logs["val_loss"],
                 logs["val_accuracy"],
             )
+
+    def on_train_end(self, logs=None):
+        write_data_train(
+            self.step,
+            logs["loss"],
+            logs["accuracy"],
+        )
+        write_data_val(
+            self.step - 1,
+            logs["val_loss"],
+            logs["val_accuracy"],
+        )
 
 
 def write_data_train(
@@ -63,8 +86,7 @@ def write_data_val(
     val_accuracy,
     filename="run_log_val.csv",
 ):
-
-    if step == 53:
+    if step == int(no_steps / BATCH_SPLIT):
         if os.path.exists(f"{LOGS_PATH}/{filename}"):
             os.remove(f"{LOGS_PATH}/{filename}")
 
@@ -83,6 +105,26 @@ def write_data_val(
         val_accuracy,
         val_loss,
     )
+
+
+def get_model_summary(model, filename="model_summary.txt"):
+    if model:
+        if os.path.exists(f"{LOGS_PATH}/{filename}"):
+            os.remove(f"{LOGS_PATH}/{filename}")
+
+    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
+        model.summary(print_fn=lambda x: file.write(x + "\n"))
+    return model.summary()
+
+
+def get_model_params(params, filename="model_params.json"):
+    if params:
+        if os.path.exists(f"{LOGS_PATH}/{filename}"):
+            os.remove(f"{LOGS_PATH}/{filename}")
+
+    with open(f"{LOGS_PATH}/{filename}", "w", encoding="utf-8") as f:
+        json.dump(params, f, ensure_ascii=False, indent=4)
+    return params
 
 
 def write_data_simple(

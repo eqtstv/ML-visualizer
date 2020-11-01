@@ -1,5 +1,6 @@
 import dash
 import pathlib
+import json
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
@@ -16,6 +17,8 @@ LOGS_PATH = pathlib.Path(__file__).parent.joinpath("logs").resolve()
 
 LOGFILE_TRAIN = "run_log_train.csv"
 LOGFILE_VAL = "run_log_val.csv"
+MODEL_SUMMARY = "model_summary.txt"
+MODEL_PARAMS = "model_params.json"
 
 
 def update_graph(
@@ -26,7 +29,7 @@ def update_graph(
     run_log_json,
     yaxis_title,
 ):
-    def smooth(scalars, weight=0.5):
+    def smooth(scalars, weight=0.6):
         last = scalars[0]
         smoothed = list()
         for point in scalars:
@@ -158,7 +161,7 @@ app.layout = dbc.Container(
                     ),
                     className="banner",
                 ),
-                style={"height": "8%"},
+                style={"height": "6%"},
             ),
             dbc.Row(
                 [
@@ -171,7 +174,7 @@ app.layout = dbc.Container(
                             ],
                         ),
                         className="side-bar",
-                        width=3,
+                        width=2,
                     ),
                     dbc.Col(
                         dbc.Row(
@@ -205,6 +208,8 @@ app.layout = dbc.Container(
                                                     id="div-current-loss-value",
                                                     className="chart-stats",
                                                 ),
+                                                html.Div(id="div-model-summary"),
+                                                html.Div(id="div-model-params"),
                                             ],
                                             className="div-graphs-stats",
                                         ),
@@ -375,6 +380,29 @@ def update_div_current_loss_value(run_log_json):
             html.Div(f"Training: {run_log_df['train loss'].iloc[-1]:.4f}"),
             html.Div(f"Validation: {run_log_df['val loss'].iloc[-1]:.4f}"),
         ]
+
+
+@app.callback(
+    Output("div-model-summary", "children"), [Input("run-log-storage", "data")]
+)
+def get_model_summary(run_log_json):
+    with open(f"{LOGS_PATH}/{MODEL_SUMMARY}") as fp:
+        lines = []
+        div = html.Div(children=lines)
+        for line in fp:
+            lines.append(html.P(line))
+
+    return div
+
+
+@app.callback(
+    Output("div-model-params", "children"), [Input("run-log-storage", "data")]
+)
+def get_model_params(run_log_json):
+    with open(f"{LOGS_PATH}/{MODEL_PARAMS}") as fp:
+        data = str(json.load(fp))
+
+    return html.Div(data)
 
 
 if __name__ == "__main__":

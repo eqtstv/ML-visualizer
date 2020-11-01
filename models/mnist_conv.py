@@ -2,6 +2,7 @@ import sys
 import numpy as np
 from tensorflow import keras
 from tensorflow.keras import layers
+from keras.callbacks import TensorBoard
 
 sys.path.insert(0, "..")
 from utils.tfutils import LossAndAccToCsvCallback
@@ -41,7 +42,8 @@ model = keras.Sequential(
     ]
 )
 
-model.summary()
+tensorboard = TensorBoard()
+
 
 batch_size = 128
 epochs = 15
@@ -54,7 +56,7 @@ model.fit(
     batch_size=batch_size,
     epochs=epochs,
     validation_split=0.1,
-    callbacks=[LossAndAccToCsvCallback()],
+    callbacks=[LossAndAccToCsvCallback(), tensorboard],
 )
 
 score = model.evaluate(x_test, y_test, verbose=0)

@@ -2,12 +2,11 @@
 import tensorflow as tf
 from tensorflow import keras
 
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 
 import sys
+
 sys.path.insert(0, "..")
 from utils.tfutils import LossAndAccToCsvCallback
 
@@ -45,6 +44,8 @@ model.fit(
     callbacks=[LossAndAccToCsvCallback()],
     validation_split=0.2,
 )
+
+
 """
 model.fit(
     x_train,
