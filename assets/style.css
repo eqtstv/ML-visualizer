@@ -562,6 +562,10 @@ h5 {
   margin-top: 5px;
 }
 
+.mb-3 {
+  height: 20px;
+}
+
 p {
   font-weight: 400;
   font-size: 14px;

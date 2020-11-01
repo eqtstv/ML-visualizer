@@ -56,7 +56,7 @@ model.fit(
     batch_size=batch_size,
     epochs=epochs,
     validation_split=0.1,
-    callbacks=[LossAndAccToCsvCallback(), tensorboard],
+    callbacks=[LossAndAccToCsvCallback()],
 )
 
 score = model.evaluate(x_test, y_test, verbose=0)

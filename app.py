@@ -19,6 +19,7 @@ LOGFILE_TRAIN = "run_log_train.csv"
 LOGFILE_VAL = "run_log_val.csv"
 MODEL_SUMMARY = "model_summary.txt"
 MODEL_PARAMS = "model_params.json"
+EPOCH_TIMES = "epoch_times.csv"
 
 
 def update_graph(
@@ -202,6 +203,25 @@ app.layout = dbc.Container(
                                                         html.Div(
                                                             id="div-step-display",
                                                         ),
+                                                        html.Div(
+                                                            children=[
+                                                                dcc.Interval(
+                                                                    id="progress-interval",
+                                                                    n_intervals=0,
+                                                                    interval=500,
+                                                                ),
+                                                                dbc.Progress(
+                                                                    id="epoch-progress",
+                                                                    className="mb-3",
+                                                                    striped=True,
+                                                                ),
+                                                                dbc.Progress(
+                                                                    id="learning-progress",
+                                                                    className="mb-3",
+                                                                    striped=True,
+                                                                ),
+                                                            ]
+                                                        ),
                                                     ],
                                                 ),
                                                 html.Div(
@@ -269,6 +289,7 @@ def update_interval_log_update(interval_rate):
 def get_run_log(_):
     names_train = [
         "step",
+        "batch",
         "train accuracy",
         "train loss",
     ]
@@ -276,6 +297,8 @@ def get_run_log(_):
         "step",
         "val accuracy",
         "val loss",
+        "epoch",
+        "epoch time",
     ]
 
     try:
@@ -299,8 +322,19 @@ def get_run_log(_):
 def update_div_step_display(run_log_json):
     if run_log_json:
         run_log_df = pd.read_json(run_log_json, orient="split")
-        return html.H6(
-            f"Step: {run_log_df['step'].iloc[-1]}",
+
+        last_val_index = run_log_df["epoch"].last_valid_index()
+        epoch = run_log_df["epoch"].iloc[last_val_index] + 1
+        et = run_log_df["epoch time"].iloc[last_val_index]
+        eta = et * 10
+
+        return html.Div(
+            children=[
+                html.H6(f"Epoch: {epoch:.0f}"),
+                html.H6(f"Step: {run_log_df['step'].iloc[-1]}"),
+                html.H6(f"Epoch time: {et:.4f} s."),
+                html.H6(f"Estimated training time: {eta:.4f} s."),
+            ]
         )
 
 
@@ -347,6 +381,7 @@ def update_loss_graph(run_log_json):
 def update_div_current_accuracy_value(run_log_json):
     if run_log_json:
         run_log_df = pd.read_json(run_log_json, orient="split")
+        last_val_index = run_log_df["epoch"].last_valid_index()
         return [
             html.P(
                 "Current Accuracy:",
@@ -357,7 +392,9 @@ def update_div_current_accuracy_value(run_log_json):
                 },
             ),
             html.Div(f"Training: {run_log_df['train accuracy'].iloc[-1]:.4f}"),
-            html.Div(f"Validation: {run_log_df['val accuracy'].iloc[-1]:.4f}"),
+            html.Div(
+                f"Validation: {run_log_df['val accuracy'].iloc[last_val_index]:.4f}"
+            ),
         ]
 
 
@@ -368,6 +405,7 @@ def update_div_current_accuracy_value(run_log_json):
 def update_div_current_loss_value(run_log_json):
     if run_log_json:
         run_log_df = pd.read_json(run_log_json, orient="split")
+        last_val_index = run_log_df["epoch"].last_valid_index()
         return [
             html.P(
                 "Current Loss:",
@@ -378,7 +416,7 @@ def update_div_current_loss_value(run_log_json):
                 },
             ),
             html.Div(f"Training: {run_log_df['train loss'].iloc[-1]:.4f}"),
-            html.Div(f"Validation: {run_log_df['val loss'].iloc[-1]:.4f}"),
+            html.Div(f"Validation: {run_log_df['val loss'].iloc[last_val_index]:.4f}"),
         ]
 
 
@@ -403,6 +441,30 @@ def get_model_params(run_log_json):
         data = str(json.load(fp))
 
     return html.Div(data)
+
+
+@app.callback(
+    [
+        Output("epoch-progress", "value"),
+        Output("epoch-progress", "children"),
+        Output("learning-progress", "value"),
+        Output("learning-progress", "children"),
+    ],
+    [Input("run-log-storage", "data")],
+)
+def update_progress(run_log_json):
+    if run_log_json:
+        run_log_df = pd.read_json(run_log_json, orient="split")
+
+    batch_prog = run_log_df["batch"].iloc[-1] * 100 / 1484
+    step_prog = run_log_df["step"].iloc[-1] * 100 / 540
+
+    return (
+        batch_prog,
+        f"{batch_prog:.0f} %" if step_prog >= 5 else "",
+        step_prog,
+        f"{step_prog:.0f} %" if step_prog >= 5 else "",
+    )
 
 
 if __name__ == "__main__":
