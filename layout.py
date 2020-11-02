@@ -69,11 +69,13 @@ app_layout = dbc.Container(
                                                                     id="epoch-progress",
                                                                     className="mb-3",
                                                                     striped=True,
+                                                                    animated=True,
                                                                 ),
                                                                 dbc.Progress(
                                                                     id="learning-progress",
                                                                     className="mb-3",
                                                                     striped=True,
+                                                                    animated=True,
                                                                 ),
                                                             ]
                                                         ),
@@ -113,6 +115,7 @@ app_layout = dbc.Container(
             ),
             dcc.Interval(id="interval-log-update", n_intervals=0),
             dcc.Store(id="run-log-storage", storage_type="memory"),
+            dcc.Store(id="model-stats-storage", storage_type="memory"),
         ],
     ),
     fluid=True,

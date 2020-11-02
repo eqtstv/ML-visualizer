@@ -3,31 +3,70 @@ import sys
 import csv
 import json
 import pathlib
+import shutil
 import tensorflow as tf
 
 from tensorflow import keras
 from timeit import default_timer as timer
 
 LOGS_PATH = pathlib.Path(__file__).parent.joinpath("logs").resolve()
+FILENAMES = {
+    "log_train": "run_log_train.csv",
+    "log_val": "run_log_val.csv",
+    "summary": "model_summary.txt",
+    "params": "model_params.json",
+}
 
-BATCH_SPLIT = 28
-NO_STEPS = 0
+TRACKING_PRECISION = 0.05
+
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class ParametersTracker(metaclass=Singleton):
+    def __init__(self, tracking_precision):
+        self.tracking_precision = tracking_precision
+
+    def get_batch_split(self, no_steps):
+        self.no_steps = no_steps
+        self.batch_split = int(self.no_steps * self.tracking_precision)
+        return self.batch_split
+
+    def get_first_val_step(self):
+        return int(self.no_steps / self.batch_split)
+
+    def write_parameters(self):
+        return {
+            "tracking_precision": self.tracking_precision,
+            "no_steps": self.no_steps,
+            "batch_split": self.batch_split,
+            "max_batch_step": self.no_steps - self.batch_split,
+            "steps_in_batch": int(self.no_steps / self.batch_split),
+        }
+
+
+param_tracker = ParametersTracker(TRACKING_PRECISION)
 
 
 class LossAndAccToCsvCallback(keras.callbacks.Callback):
     def __init__(self):
         self.step = 0
-        self.start = 0
 
     def on_train_begin(self, logs=None):
-        global NO_STEPS
-        NO_STEPS = self.params["steps"]
+        clear_logs(LOGS_PATH, FILENAMES)
+        param_tracker.get_batch_split(self.params["steps"])
+
         get_model_params(self.params)
         get_model_summary(self.model)
-        get_epoch_time(0, 0)
 
     def on_train_batch_end(self, batch, logs=None):
-        if batch % BATCH_SPLIT == 0:
+        if batch % param_tracker.batch_split == 0:
             write_data_train(
                 self.step,
                 batch,
@@ -37,32 +76,33 @@ class LossAndAccToCsvCallback(keras.callbacks.Callback):
             self.step += 1
 
     def on_epoch_begin(self, epoch, logs=None):
+        self.epoch = epoch
         self.start = timer()
 
     def on_epoch_end(self, epoch, logs=None):
         self.stop = timer()
         if "val_loss" in logs.keys():
             write_data_val(
-                self.step - 1,
+                self.step,
                 logs["val_loss"],
                 logs["val_accuracy"],
-                epoch,
+                epoch + 1,
                 self.stop - self.start,
             )
 
     def on_train_end(self, logs=None):
         write_data_train(
             self.step,
-            1484,
+            param_tracker.no_steps - param_tracker.batch_split,
             logs["loss"],
             logs["accuracy"],
         )
         write_data_val(
-            self.step - 1,
+            self.step,
             logs["val_loss"],
             logs["val_accuracy"],
-            9,  # epoch
-            4.649970099999997,  # time
+            self.epoch,
+            0,
         )
 
 
@@ -71,14 +111,8 @@ def write_data_train(
     batch,
     train_loss,
     train_accuracy,
-    filename="run_log_train.csv",
+    filename=FILENAMES["log_train"],
 ):
-
-    if step == 0:
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
-
-    # Write CSV
     with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
         writer = csv.writer(file, delimiter=",")
         writer.writerow(
@@ -102,13 +136,8 @@ def write_data_val(
     val_accuracy,
     epoch,
     epoch_time,
-    filename="run_log_val.csv",
+    filename=FILENAMES["log_val"],
 ):
-    if step == int(NO_STEPS / BATCH_SPLIT):
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
-
-    # Write CSV
     with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
         writer = csv.writer(file, delimiter=",")
         writer.writerow(
@@ -127,68 +156,24 @@ def write_data_val(
     )
 
 
-def get_model_summary(model, filename="model_summary.txt"):
-    if model:
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
-
+def get_model_summary(model, filename=FILENAMES["summary"]):
     with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
         model.summary(print_fn=lambda x: file.write(x + "\n"))
     return model.summary()
 
 
-def get_model_params(params, filename="model_params.json"):
+def get_model_params(params, filename=FILENAMES["params"]):
     if params:
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
+        params.update(param_tracker.write_parameters())
+        params.update({"no_tracked_steps": params["epochs"] * params["steps_in_batch"]})
 
     with open(f"{LOGS_PATH}/{filename}", "w", encoding="utf-8") as f:
         json.dump(params, f, ensure_ascii=False, indent=4)
+
     return params
 
 
-def get_epoch_time(epoch, time, filename="epoch_times.csv"):
-    if epoch == 0:
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
-
-    # Write CSV
-    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerow([epoch, time])
-
-    return (epoch, time)
-
-
-def write_data_simple(
-    step,
-    train_loss,
-    train_accuracy,
-    test_loss,
-    test_accuracy,
-    filename="run_log.csv",
-):
-
-    if step == "1":
-        if os.path.exists(f"{LOGS_PATH}/{filename}"):
-            os.remove(f"{LOGS_PATH}/{filename}")
-
-    # Write CSV
-    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerow(
-            [
-                step,
-                train_accuracy,
-                train_loss,
-                test_accuracy,
-                test_loss,
-            ]
-        )
-
-    return (
-        train_accuracy,
-        train_loss,
-        test_accuracy,
-        test_loss,
-    )
+def clear_logs(folder, files):
+    for key, filename in files.items():
+        if os.path.exists(f"{folder}/{filename}"):
+            os.remove(f"{folder}/{filename}")
