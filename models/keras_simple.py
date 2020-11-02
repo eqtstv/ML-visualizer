@@ -1,14 +1,10 @@
-# TensorFlow and tf.keras
+import sys
 import tensorflow as tf
+
 from tensorflow import keras
 
-import numpy as np
-import matplotlib.pyplot as plt
-
-import sys
-
 sys.path.insert(0, "..")
-from utils.tfutils import LossAndAccToCsvCallback
+from tfutils import LossAndAccToCsvCallback
 
 fashion_mnist = tf.keras.datasets.fashion_mnist
 
@@ -44,23 +40,3 @@ model.fit(
     callbacks=[LossAndAccToCsvCallback()],
     validation_split=0.2,
 )
-
-
-"""
-model.fit(
-    x_train,
-    y_train,
-    batch_size=128,
-    epochs=2,
-    verbose=0,
-    callbacks=[LossAndErrorPrintingCallback()],
-)
-
-res = model.evaluate(
-    x_test,
-    y_test,
-    batch_size=128,
-    verbose=0,
-    callbacks=[LossAndErrorPrintingCallback()],
-)
-"""

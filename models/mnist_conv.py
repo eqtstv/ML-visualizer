@@ -1,11 +1,11 @@
 import sys
 import numpy as np
+
 from tensorflow import keras
 from tensorflow.keras import layers
-from keras.callbacks import TensorBoard
 
 sys.path.insert(0, "..")
-from utils.tfutils import LossAndAccToCsvCallback
+from tfutils import LossAndAccToCsvCallback
 
 # Model / data parameters
 num_classes = 10
@@ -41,9 +41,6 @@ model = keras.Sequential(
         layers.Dense(num_classes, activation="softmax"),
     ]
 )
-
-tensorboard = TensorBoard()
-
 
 batch_size = 128
 epochs = 15

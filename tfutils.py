@@ -1,17 +1,17 @@
-import tensorflow as tf
-from tensorflow import keras
-import pathlib
-import csv
 import os
 import sys
+import csv
 import json
+import pathlib
+import tensorflow as tf
+
+from tensorflow import keras
 from timeit import default_timer as timer
 
-LOGS_PATH = pathlib.Path(__file__).parent.parent.joinpath("logs").resolve()
+LOGS_PATH = pathlib.Path(__file__).parent.joinpath("logs").resolve()
 
 BATCH_SPLIT = 28
-
-no_steps = 0
+NO_STEPS = 0
 
 
 class LossAndAccToCsvCallback(keras.callbacks.Callback):
@@ -20,8 +20,8 @@ class LossAndAccToCsvCallback(keras.callbacks.Callback):
         self.start = 0
 
     def on_train_begin(self, logs=None):
-        global no_steps
-        no_steps = self.params["steps"]
+        global NO_STEPS
+        NO_STEPS = self.params["steps"]
         get_model_params(self.params)
         get_model_summary(self.model)
         get_epoch_time(0, 0)
@@ -104,7 +104,7 @@ def write_data_val(
     epoch_time,
     filename="run_log_val.csv",
 ):
-    if step == int(no_steps / BATCH_SPLIT):
+    if step == int(NO_STEPS / BATCH_SPLIT):
         if os.path.exists(f"{LOGS_PATH}/{filename}"):
             os.remove(f"{LOGS_PATH}/{filename}")
 
