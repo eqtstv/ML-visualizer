@@ -48,7 +48,7 @@ class ParametersTracker(metaclass=Singleton):
 param_tracker = ParametersTracker(TRACKING_PRECISION)
 
 
-class LossAndAccToCsvCallback(keras.callbacks.Callback):
+class LiveLearningTracking(keras.callbacks.Callback):
     def __init__(self):
         self.step = 0
 
