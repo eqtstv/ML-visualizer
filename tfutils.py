@@ -1,23 +1,17 @@
 import os
-import sys
 import csv
 import json
 import pathlib
 import shutil
 import tensorflow as tf
 
+from app import config
 from tensorflow import keras
 from timeit import default_timer as timer
 
-LOGS_PATH = pathlib.Path(__file__).parent.joinpath("logs").resolve()
-FILENAMES = {
-    "log_train": "run_log_train.csv",
-    "log_val": "run_log_val.csv",
-    "summary": "model_summary.txt",
-    "params": "model_params.json",
-}
-
-TRACKING_PRECISION = 0.05
+LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
+FILENAMES_DICT = config["filenames"]
+TRACKING_PRECISION = config["tracking_precision"]
 
 
 class Singleton(type):
@@ -59,7 +53,7 @@ class LossAndAccToCsvCallback(keras.callbacks.Callback):
         self.step = 0
 
     def on_train_begin(self, logs=None):
-        clear_logs(LOGS_PATH, FILENAMES)
+        clear_logs(LOGS_PATH, FILENAMES_DICT)
         param_tracker.get_batch_split(self.params["steps"])
 
         get_model_params(self.params)
@@ -111,7 +105,7 @@ def write_data_train(
     batch,
     train_loss,
     train_accuracy,
-    filename=FILENAMES["log_train"],
+    filename=FILENAMES_DICT["log_train"],
 ):
     with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
         writer = csv.writer(file, delimiter=",")
@@ -136,9 +130,9 @@ def write_data_val(
     val_accuracy,
     epoch,
     epoch_time,
-    filename=FILENAMES["log_val"],
+    filename=FILENAMES_DICT["log_val"],
 ):
-    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
+    with open(f"{LOGS_PATH}/{filename}", "a+", newline="") as file:
         writer = csv.writer(file, delimiter=",")
         writer.writerow(
             [
@@ -156,18 +150,18 @@ def write_data_val(
     )
 
 
-def get_model_summary(model, filename=FILENAMES["summary"]):
-    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
+def get_model_summary(model, filename=FILENAMES_DICT["model_summary"]):
+    with open(f"{LOGS_PATH}/{filename}", "a+", newline="") as file:
         model.summary(print_fn=lambda x: file.write(x + "\n"))
     return model.summary()
 
 
-def get_model_params(params, filename=FILENAMES["params"]):
+def get_model_params(params, filename=FILENAMES_DICT["model_params"]):
     if params:
         params.update(param_tracker.write_parameters())
         params.update({"no_tracked_steps": params["epochs"] * params["steps_in_batch"]})
 
-    with open(f"{LOGS_PATH}/{filename}", "w", encoding="utf-8") as f:
+    with open(f"{LOGS_PATH}/{filename}", "a+", encoding="utf-8") as f:
         json.dump(params, f, ensure_ascii=False, indent=4)
 
     return params
