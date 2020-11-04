@@ -1,13 +1,14 @@
-import os
 import csv
 import json
+import os
 import pathlib
 import shutil
+from timeit import default_timer as timer
+
 import tensorflow as tf
+from tensorflow import keras
 
 from app import config
-from tensorflow import keras
-from timeit import default_timer as timer
 
 LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
 FILENAMES_DICT = config["filenames"]
@@ -27,10 +28,12 @@ class ParametersTracker(metaclass=Singleton):
     def __init__(self, tracking_precision):
         self.tracking_precision = tracking_precision
 
-    def get_batch_split(self, no_steps):
+    def get_model_parameters(self, no_steps):
         self.no_steps = no_steps
-        self.batch_split = int(self.no_steps * self.tracking_precision)
-        return self.batch_split
+        self.steps_in_batch = int(self.no_steps * self.tracking_precision)
+        self.batch_split = self.no_steps // self.steps_in_batch + (
+            (self.no_steps % self.steps_in_batch) > 0
+        )
 
     def get_first_val_step(self):
         return int(self.no_steps / self.batch_split)
@@ -40,8 +43,8 @@ class ParametersTracker(metaclass=Singleton):
             "tracking_precision": self.tracking_precision,
             "no_steps": self.no_steps,
             "batch_split": self.batch_split,
-            "max_batch_step": self.no_steps - self.batch_split,
-            "steps_in_batch": int(self.no_steps / self.batch_split),
+            "max_batch_step": self.batch_split * (self.steps_in_batch - 1),
+            "steps_in_batch": self.steps_in_batch,
         }
 
 
@@ -54,10 +57,10 @@ class LiveLearningTracking(keras.callbacks.Callback):
 
     def on_train_begin(self, logs=None):
         clear_logs(LOGS_PATH, FILENAMES_DICT)
-        param_tracker.get_batch_split(self.params["steps"])
+        param_tracker.get_model_parameters(self.params["steps"])
 
-        get_model_params(self.params)
-        get_model_summary(self.model)
+        write_model_params(self.params)
+        write_model_summary(self.model)
 
     def on_train_batch_end(self, batch, logs=None):
         if batch % param_tracker.batch_split == 0:
@@ -150,13 +153,13 @@ def write_data_val(
     )
 
 
-def get_model_summary(model, filename=FILENAMES_DICT["model_summary"]):
+def write_model_summary(model, filename=FILENAMES_DICT["model_summary"]):
     with open(f"{LOGS_PATH}/{filename}", "a+", newline="") as file:
         model.summary(print_fn=lambda x: file.write(x + "\n"))
     return model.summary()
 
 
-def get_model_params(params, filename=FILENAMES_DICT["model_params"]):
+def write_model_params(params, filename=FILENAMES_DICT["model_params"]):
     if params:
         params.update(param_tracker.write_parameters())
         params.update({"no_tracked_steps": params["epochs"] * params["steps_in_batch"]})

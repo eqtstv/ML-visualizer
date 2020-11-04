@@ -1,6 +1,6 @@
 import sys
-import tensorflow as tf
 
+import tensorflow as tf
 from tensorflow import keras
 
 sys.path.insert(0, "..")

@@ -1,12 +1,13 @@
 import json
 import pathlib
-import pandas as pd
-import plotly.graph_objs as go
+
 import dash_core_components as dcc
 import dash_html_components as html
+import pandas as pd
+import plotly.graph_objs as go
+from dash.dependencies import Input, Output
 
 from app import app, config
-from dash.dependencies import Input, Output
 
 LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
 FILENAMES_DICT = config["filenames"]
@@ -223,40 +224,6 @@ def get_run_log(_):
 
 
 @app.callback(
-    Output("div-step-display", "children"),
-    [Input("run-log-storage", "data"), Input("model-stats-storage", "data")],
-)
-def update_div_step_display(run_log_json, model_stats):
-    if run_log_json:
-        run_log_df = pd.read_json(run_log_json, orient="split")
-        steps_div = (
-            html.H6(
-                f"Step: {run_log_df['step'].iloc[-1]} / {model_stats['no_tracked_steps']}"
-            ),
-        )
-
-        if "epoch" in run_log_df:
-            last_val_index = run_log_df["epoch"].last_valid_index()
-            epoch = run_log_df["epoch"].iloc[last_val_index] + 1
-            et = run_log_df["epoch time"].iloc[last_val_index]
-            eta = et * model_stats["epochs"]
-
-            epochs_div = html.H6(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
-            epoch_time_div = html.H6(f"Epoch time: {et:.4f} s.")
-            eta_div = html.H6(f"Estimated training time: {eta:.4f} s.")
-
-            return html.Div(
-                children=[
-                    epochs_div,
-                    steps_div[0],
-                    epoch_time_div,
-                    eta_div,
-                ]
-            )
-        return html.Div(children=steps_div)
-
-
-@app.callback(
     Output("div-accuracy-graph", "children"),
     [
         Input("run-log-storage", "data"),
@@ -395,6 +362,43 @@ def get_model_params_div(model_stats):
 
 
 @app.callback(
+    Output("div-epoch-step-display", "children"),
+    [Input("run-log-storage", "data"), Input("model-stats-storage", "data")],
+)
+def update_div_step_display(run_log_json, model_stats):
+    if run_log_json:
+        run_log_df = pd.read_json(run_log_json, orient="split")
+
+        residue = model_stats["no_steps"] - model_stats["max_batch_step"]
+        if residue == 0:
+            residue = model_stats["batch_split"]
+        steps_div = (
+            html.H6(
+                f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_stats['no_steps']}"
+            ),
+        )
+        epochs_div = html.H6(f"Epoch: {1:.0f} / {model_stats['epochs']}")
+
+        if "epoch" in run_log_df:
+            last_val_index = run_log_df["epoch"].last_valid_index()
+            epoch = run_log_df["epoch"].iloc[last_val_index] + 1
+            epochs_div = html.H6(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
+
+            et = run_log_df["epoch time"].iloc[last_val_index]
+            eta = et * model_stats["epochs"]
+            epoch_time_div = html.H6(f"Epoch time: {et:.4f} s.")
+            eta_div = html.H6(f"Estimated training time: {eta:.4f} s.")
+
+            return html.Div(
+                children=[
+                    steps_div[0],
+                    epochs_div,
+                ]
+            )
+        return html.Div(children=[steps_div[0], epochs_div])
+
+
+@app.callback(
     [
         Output("epoch-progress", "value"),
         Output("epoch-progress", "children"),
@@ -407,12 +411,14 @@ def update_progress(run_log_json, model_stats):
     if run_log_json:
         run_log_df = pd.read_json(run_log_json, orient="split")
 
-        batch_prog = run_log_df["batch"].iloc[-1] * 100 / model_stats["max_batch_step"]
+        batch_prog = (
+            (run_log_df["batch"].iloc[-1]) * 100 / model_stats["max_batch_step"]
+        )
         step_prog = run_log_df["step"].iloc[-1] * 100 / model_stats["no_tracked_steps"]
 
         return (
             batch_prog,
-            f"{batch_prog:.0f} %" if step_prog >= 5 else "",
+            f"{batch_prog:.0f} %" if batch_prog >= 5 else "",
             step_prog,
             f"{step_prog:.0f} %" if step_prog >= 5 else "",
         )
