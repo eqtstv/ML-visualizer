@@ -1,7 +1,6 @@
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
-import dash_bootstrap_components as dbc
-
 
 app_layout = dbc.Container(
     html.Div(
@@ -56,7 +55,7 @@ app_layout = dbc.Container(
                                                     id="div-interval-control",
                                                     children=[
                                                         html.Div(
-                                                            id="div-step-display",
+                                                            id="div-epoch-step-display",
                                                         ),
                                                         html.Div(
                                                             children=[

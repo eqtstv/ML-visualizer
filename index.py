@@ -1,8 +1,6 @@
 import callbacks
-
 from app import app
 from layout import app_layout
-
 
 app.layout = app_layout
 

@@ -1,6 +1,7 @@
-import dash
 import json
 import pathlib
+
+import dash
 import dash_bootstrap_components as dbc
 
 CONFIG_PATH = pathlib.Path(__file__).parent.joinpath("config.json").resolve()

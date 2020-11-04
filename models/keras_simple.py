@@ -1,10 +1,10 @@
 import sys
-import tensorflow as tf
 
+import tensorflow as tf
 from tensorflow import keras
 
 sys.path.insert(0, "..")
-from tfutils import LossAndAccToCsvCallback
+from tfutils import LiveLearningTracking
 
 fashion_mnist = tf.keras.datasets.fashion_mnist
 
@@ -37,6 +37,6 @@ model.fit(
     train_images,
     train_labels,
     epochs=10,
-    callbacks=[LossAndAccToCsvCallback()],
+    callbacks=[LiveLearningTracking()],
     validation_split=0.2,
 )

@@ -1,11 +1,11 @@
 import sys
-import numpy as np
 
+import numpy as np
 from tensorflow import keras
 from tensorflow.keras import layers
 
 sys.path.insert(0, "..")
-from tfutils import LossAndAccToCsvCallback
+from tfutils import LiveLearningTracking
 
 # Model / data parameters
 num_classes = 10
@@ -53,7 +53,7 @@ model.fit(
     batch_size=batch_size,
     epochs=epochs,
     validation_split=0.1,
-    callbacks=[LossAndAccToCsvCallback()],
+    callbacks=[LiveLearningTracking()],
 )
 
 score = model.evaluate(x_test, y_test, verbose=0)
