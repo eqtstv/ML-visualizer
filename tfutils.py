@@ -153,9 +153,25 @@ def write_data_val(
     )
 
 
-def write_model_summary(model, filename=FILENAMES_DICT["model_summary"]):
-    with open(f"{LOGS_PATH}/{filename}", "a+", newline="") as file:
-        model.summary(print_fn=lambda x: file.write(x + "\n"))
+def write_model_summary(
+    model,
+    filename1=FILENAMES_DICT["model_summary"],
+    filename2=FILENAMES_DICT["layers_summary"],
+):
+    model_summary = str(model.to_json())
+    layer_params = {
+        "layers": [
+            (layer.get_config(), {"no_params": layer.count_params()})
+            for layer in model.layers
+        ]
+    }
+
+    with open(f"{LOGS_PATH}/{filename1}", "a+", newline="") as file:
+        file.write(model_summary)
+
+    with open(f"{LOGS_PATH}/{filename2}", "a+", newline="") as file:
+        json.dump(layer_params, file, ensure_ascii=False, indent=4)
+
     return model.summary()
 
 

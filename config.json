@@ -2,7 +2,8 @@
   "filenames": {
     "log_train": "run_log_train.csv",
     "log_val": "run_log_val.csv",
-    "model_summary": "model_summary.txt",
+    "model_summary": "model_summary.json",
+    "layers_summary": "layers_summary.json",
     "model_params": "model_params.json"
   },
   "logs_folder": "logs",

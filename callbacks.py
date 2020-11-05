@@ -342,23 +342,57 @@ def update_div_current_loss_value(run_log_json):
     Output("div-model-summary", "children"), [Input("run-log-storage", "data")]
 )
 def get_model_summary(run_log_json):
-    try:
-        with open(f"{LOGS_PATH}/{FILENAMES_DICT['model_summary']}") as fp:
-            lines = []
-            div = html.Div(children=lines)
-            for line in fp:
-                lines.append(html.P(line))
+    def get_input_layer_info(summary):
+        layer_info = {
+            "Class name": summary["config"]["layers"][0]["class_name"],
+            "Name": summary["config"]["layers"][0]["config"]["name"],
+            "Input shape": summary["config"]["layers"][0]["config"][
+                "batch_input_shape"
+            ],
+        }
+        return layer_info
 
-        return div
-    except:
-        return None
+    def get_layers(summary):
+        layers = {}
+
+        def get_layer_info(layer):
+            layer_info = {
+                "Class name": layer["class_name"],
+                "Name": layer["config"]["name"],
+            }
+
+            if layer["class_name"] == "Dense":
+                layer_info["units"] = layer["config"]["units"]
+                layer_info["activation"] = layer["config"]["activation"]
+            return layer_info
+
+        for i, layer in enumerate(summary["config"]["layers"]):
+            layers[i + 1] = get_layer_info(layer)
+
+        return layers
+
+    with open(f"{LOGS_PATH}/{FILENAMES_DICT['model_summary']}") as fp:
+        model_summary = json.load(fp)
+
+    model_class_name = html.P(
+        str(
+            {
+                "Class name": model_summary["class_name"],
+                "Name": model_summary["config"]["name"],
+            }
+        )
+    )
+    model_input_layer_info = html.P(str(get_input_layer_info(model_summary)))
+    model_layers = html.P(str(get_layers(model_summary)))
+
+    return html.Div([model_class_name, model_input_layer_info, model_layers])
 
 
 @app.callback(
     Output("div-model-params", "children"), [Input("model-stats-storage", "data")]
 )
 def get_model_params_div(model_stats):
-    return html.Div(str(model_stats))
+    return html.Div(html.P(str(model_stats)))
 
 
 @app.callback(

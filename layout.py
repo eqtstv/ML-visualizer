@@ -110,7 +110,7 @@ app_layout = dbc.Container(
                         className="main-frame",
                     ),
                 ],
-                style={"height": "92%"},
+                style={"height": "94%"},
             ),
             dcc.Interval(id="interval-log-update", n_intervals=0),
             dcc.Store(id="run-log-storage", storage_type="memory"),
