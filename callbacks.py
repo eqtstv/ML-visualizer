@@ -278,7 +278,7 @@ def update_div_current_accuracy_value(run_log_json):
                     "Current Accuracy:",
                     style={
                         "font-weight": "bold",
-                        "margin-top": "15px",
+                        "margin-top": "10px",
                         "margin-bottom": "0px",
                     },
                 ),
@@ -290,7 +290,7 @@ def update_div_current_accuracy_value(run_log_json):
                 "Current Accuracy:",
                 style={
                     "font-weight": "bold",
-                    "margin-top": "15px",
+                    "margin-top": "10px",
                     "margin-bottom": "0px",
                 },
             ),
