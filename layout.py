@@ -47,6 +47,28 @@ app_layout = dbc.Container(
                                         html.Div(
                                             children=[
                                                 html.Div(
+                                                    children=[
+                                                        dcc.Interval(
+                                                            id="progress-interval",
+                                                            n_intervals=0,
+                                                            interval=500,
+                                                        ),
+                                                        dbc.Progress(
+                                                            id="epoch-progress",
+                                                            className="prog-bar",
+                                                            striped=True,
+                                                            animated=True,
+                                                        ),
+                                                        dbc.Progress(
+                                                            id="learning-progress",
+                                                            className="prog-bar",
+                                                            striped=True,
+                                                            animated=True,
+                                                        ),
+                                                    ],
+                                                    className="progress-bars-div",
+                                                ),
+                                                html.Div(
                                                     id="div-current-accuracy-value",
                                                     className="chart-stats",
                                                 ),
@@ -57,38 +79,17 @@ app_layout = dbc.Container(
                                                         html.Div(
                                                             id="div-epoch-step-display",
                                                         ),
-                                                        html.Div(
-                                                            children=[
-                                                                dcc.Interval(
-                                                                    id="progress-interval",
-                                                                    n_intervals=0,
-                                                                    interval=500,
-                                                                ),
-                                                                dbc.Progress(
-                                                                    id="epoch-progress",
-                                                                    className="mb-3",
-                                                                    striped=True,
-                                                                    animated=True,
-                                                                ),
-                                                                dbc.Progress(
-                                                                    id="learning-progress",
-                                                                    className="mb-3",
-                                                                    striped=True,
-                                                                    animated=True,
-                                                                ),
-                                                            ]
-                                                        ),
                                                     ],
                                                 ),
                                                 html.Div(
                                                     id="div-current-loss-value",
                                                     className="chart-stats",
                                                 ),
-                                                html.Div(id="div-model-summary"),
-                                                html.Div(id="div-model-params"),
                                             ],
                                             className="div-graphs-stats",
                                         ),
+                                        html.Div(id="div-model-summary"),
+                                        html.Div(id="div-model-params"),
                                     ],
                                     className="graphs-frame",
                                 ),

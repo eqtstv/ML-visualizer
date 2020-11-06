@@ -344,21 +344,21 @@ def update_div_current_loss_value(run_log_json):
 def get_model_summary(run_log_json):
     def get_input_layer_info(summary):
         layer_info = {
-            "Class name": summary["config"]["layers"][0]["class_name"],
-            "Name": summary["config"]["layers"][0]["config"]["name"],
-            "Input shape": summary["config"]["layers"][0]["config"][
+            "class_name": summary["config"]["layers"][0]["class_name"],
+            "name": summary["config"]["layers"][0]["config"]["name"],
+            "input_shape": summary["config"]["layers"][0]["config"][
                 "batch_input_shape"
             ],
         }
         return layer_info
 
     def get_layers(summary):
-        layers = {}
+        layers = []
 
         def get_layer_info(layer):
             layer_info = {
-                "Class name": layer["class_name"],
-                "Name": layer["config"]["name"],
+                "Type": layer["class_name"],
+                "name": layer["config"]["name"],
             }
 
             if layer["class_name"] == "Dense":
@@ -367,25 +367,41 @@ def get_model_summary(run_log_json):
             return layer_info
 
         for i, layer in enumerate(summary["config"]["layers"]):
-            layers[i + 1] = get_layer_info(layer)
+            layers.append(html.P(str(get_layer_info(layer))))
 
         return layers
 
     with open(f"{LOGS_PATH}/{FILENAMES_DICT['model_summary']}") as fp:
         model_summary = json.load(fp)
 
-    model_class_name = html.P(
-        str(
-            {
-                "Class name": model_summary["class_name"],
-                "Name": model_summary["config"]["name"],
-            }
-        )
-    )
-    model_input_layer_info = html.P(str(get_input_layer_info(model_summary)))
-    model_layers = html.P(str(get_layers(model_summary)))
+    input_layer_info = get_input_layer_info(model_summary)
+    layers_info = get_layers(model_summary)
 
-    return html.Div([model_class_name, model_input_layer_info, model_layers])
+    model_class_name_div = html.Div(
+        children=[
+            html.P("Model:"),
+            html.P(f"Type: {model_summary['class_name']}"),
+            html.P(f"Name: {model_summary['config']['name']}"),
+        ],
+        className="model-summary",
+    )
+    model_input_layer_info_div = html.Div(
+        children=[
+            html.P("Input layer:"),
+            html.P(f"Type: {input_layer_info['class_name']}"),
+            html.P(f"Name: {input_layer_info['name']}"),
+            html.P(f"Input shape: {input_layer_info['input_shape']}"),
+        ],
+        className="model-summary",
+    )
+    model_layers_div = html.Div(
+        children=[html.P("Layers:"), html.Div(layers_info)],
+        className="model-summary",
+    )
+
+    return html.Div(
+        [model_class_name_div, model_input_layer_info_div, model_layers_div]
+    )
 
 
 @app.callback(

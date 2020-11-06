@@ -529,7 +529,30 @@ body {
 
 .chart-stats {
   display: inline-block;
-  width: 33%;
+  width: 30%;
+  height: 100px;
+  text-align: center;
+  vertical-align: middle;
+  background-color: #1d1d1d;
+  margin-left: 2.5%;
+}
+
+.progress-bars-div {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+  padding-left: 18%;
+  padding-right: 18%;
+}
+
+.prog-bar {
+  height: 20px;
+  margin-bottom: 5px;
+}
+
+.model-summary {
+  display: inline-block;
+  width: auto;
   text-align: center;
   vertical-align: middle;
 }
@@ -560,10 +583,6 @@ h5 {
 #title {
   margin-left: 10px;
   margin-top: 5px;
-}
-
-.mb-3 {
-  height: 20px;
 }
 
 p {
