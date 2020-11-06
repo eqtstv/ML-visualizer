@@ -318,7 +318,7 @@ def update_div_current_loss_value(run_log_json):
                     "Current Loss:",
                     style={
                         "font-weight": "bold",
-                        "margin-top": "15px",
+                        "margin-top": "10px",
                         "margin-bottom": "0px",
                     },
                 ),
@@ -330,7 +330,7 @@ def update_div_current_loss_value(run_log_json):
                 "Current Loss:",
                 style={
                     "font-weight": "bold",
-                    "margin-top": "15px",
+                    "margin-top": "10px",
                     "margin-bottom": "0px",
                 },
             ),

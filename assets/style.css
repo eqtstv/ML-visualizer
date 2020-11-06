@@ -530,7 +530,8 @@ body {
 .chart-stats {
   display: inline-block;
   width: 30%;
-  height: 100px;
+  padding-bottom: 10px;
+  height: auto;
   text-align: center;
   vertical-align: middle;
   background-color: #1d1d1d;
