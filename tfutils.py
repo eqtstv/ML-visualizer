@@ -59,7 +59,7 @@ class LiveLearningTracking(keras.callbacks.Callback):
         clear_logs(LOGS_PATH, FILENAMES_DICT)
         param_tracker.get_model_parameters(self.params["steps"])
 
-        write_model_params(self.params)
+        write_model_params(self.model, self.params)
         write_model_summary(self.model)
 
     def on_train_batch_end(self, batch, logs=None):
@@ -175,10 +175,15 @@ def write_model_summary(
     return model.summary()
 
 
-def write_model_params(params, filename=FILENAMES_DICT["model_params"]):
+def write_model_params(model, params, filename=FILENAMES_DICT["model_params"]):
     if params:
         params.update(param_tracker.write_parameters())
-        params.update({"no_tracked_steps": params["epochs"] * params["steps_in_batch"]})
+        params.update(
+            {
+                "no_tracked_steps": params["epochs"] * params["steps_in_batch"],
+                "total_params": model.count_params(),
+            }
+        )
 
     with open(f"{LOGS_PATH}/{filename}", "a+", encoding="utf-8") as f:
         json.dump(params, f, ensure_ascii=False, indent=4)

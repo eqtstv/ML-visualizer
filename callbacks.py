@@ -339,9 +339,10 @@ def update_div_current_loss_value(run_log_json):
 
 
 @app.callback(
-    Output("div-model-summary", "children"), [Input("run-log-storage", "data")]
+    Output("div-model-summary", "children"),
+    [Input("run-log-storage", "data"), Input("model-stats-storage", "data")],
 )
-def get_model_summary(run_log_json):
+def get_model_summary(run_log_json, model_stats):
     def get_input_layer_info(summary):
         layer_info = {
             "class_name": summary["config"]["layers"][0]["class_name"],
@@ -367,7 +368,7 @@ def get_model_summary(run_log_json):
             return layer_info
 
         for i, layer in enumerate(summary["config"]["layers"]):
-            layers.append(html.P(str(get_layer_info(layer))))
+            layers.append(get_layer_info(layer))
 
         return layers
 
@@ -387,10 +388,11 @@ def get_model_summary(run_log_json):
     )
     model_input_layer_info_div = html.Div(
         children=[
-            html.P("Input layer:"),
-            html.P(f"Type: {input_layer_info['class_name']}"),
-            html.P(f"Name: {input_layer_info['name']}"),
-            html.P(f"Input shape: {input_layer_info['input_shape']}"),
+            html.P(f"Input shape:"),
+            html.P(f"{input_layer_info['input_shape']}"),
+            html.P(f"Output:"),
+            html.P(f"Units: {layers_info[-1]['units']}"),
+            html.P(f"Activation: {layers_info[-1]['activation']}"),
         ],
         className="model-summary",
     )
@@ -399,16 +401,25 @@ def get_model_summary(run_log_json):
         className="model-summary",
     )
 
-    return html.Div(
-        [model_class_name_div, model_input_layer_info_div, model_layers_div]
+    model_layers_info = html.Div(
+        children=[
+            html.P("Number of layers:"),
+            html.P(len(layers_info) - 1),
+            html.P("Total params:"),
+            html.P(model_stats["total_params"]),
+        ],
+        className="model-summary",
     )
+
+    return model_class_name_div, model_layers_info, model_input_layer_info_div
 
 
 @app.callback(
     Output("div-model-params", "children"), [Input("model-stats-storage", "data")]
 )
 def get_model_params_div(model_stats):
-    return html.Div(html.P(str(model_stats)))
+    pass
+    # return html.Div(html.P(str(model_stats)))
 
 
 @app.callback(
@@ -423,29 +434,37 @@ def update_div_step_display(run_log_json, model_stats):
         if residue == 0:
             residue = model_stats["batch_split"]
         steps_div = (
-            html.H6(
+            html.P(
                 f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_stats['no_steps']}"
             ),
         )
-        epochs_div = html.H6(f"Epoch: {1:.0f} / {model_stats['epochs']}")
+        epochs_div = html.P(f"Epoch: {1:.0f} / {model_stats['epochs']}")
+        tracking_precision = html.P(
+            f"Tracking precision: {model_stats['tracking_precision']}"
+        )
 
         if "epoch" in run_log_df:
             last_val_index = run_log_df["epoch"].last_valid_index()
             epoch = run_log_df["epoch"].iloc[last_val_index] + 1
-            epochs_div = html.H6(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
+            epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
 
             et = run_log_df["epoch time"].iloc[last_val_index]
             eta = et * model_stats["epochs"]
-            epoch_time_div = html.H6(f"Epoch time: {et:.4f} s.")
-            eta_div = html.H6(f"Estimated training time: {eta:.4f} s.")
+            epoch_time_div = html.P(f"Epoch time: {et:.4f} s.")
+            eta_div = html.P(f"Estimated training time: {eta:.4f} s.")
 
             return html.Div(
                 children=[
                     steps_div[0],
                     epochs_div,
-                ]
+                    tracking_precision,
+                ],
+                className="learning-stats",
             )
-        return html.Div(children=[steps_div[0], epochs_div])
+        return html.Div(
+            children=[steps_div[0], epochs_div, tracking_precision],
+            className="learning-stats",
+        )
 
 
 @app.callback(
