@@ -5,6 +5,7 @@ import pathlib
 import shutil
 from timeit import default_timer as timer
 
+import requests
 import tensorflow as tf
 from tensorflow import keras
 
@@ -12,7 +13,8 @@ from app import config
 
 LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
 FILENAMES_DICT = config["filenames"]
-TRACKING_PRECISION = config["tracking_precision"]
+TRACKING_PRECISION = 0.01
+URL = "http://192.168.0.158:5050"
 
 
 class Singleton(type):
@@ -67,8 +69,8 @@ class LiveLearningTracking(keras.callbacks.Callback):
             write_data_train(
                 self.step,
                 batch,
-                logs["loss"],
                 logs["accuracy"],
+                logs["loss"],
             )
             self.step += 1
 
@@ -81,8 +83,8 @@ class LiveLearningTracking(keras.callbacks.Callback):
         if "val_loss" in logs.keys():
             write_data_val(
                 self.step,
-                logs["val_loss"],
                 logs["val_accuracy"],
+                logs["val_loss"],
                 epoch + 1,
                 self.stop - self.start,
             )
@@ -91,13 +93,13 @@ class LiveLearningTracking(keras.callbacks.Callback):
         write_data_train(
             self.step,
             param_tracker.no_steps - param_tracker.batch_split,
-            logs["loss"],
             logs["accuracy"],
+            logs["loss"],
         )
         write_data_val(
             self.step,
-            logs["val_loss"],
             logs["val_accuracy"],
+            logs["val_loss"],
             self.epoch,
             0,
         )
@@ -108,18 +110,18 @@ def write_data_train(
     batch,
     train_loss,
     train_accuracy,
-    filename=FILENAMES_DICT["log_train"],
 ):
-    with open(f"{LOGS_PATH}/{filename}", "a", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerow(
-            [
-                step,
-                batch,
-                train_accuracy,
-                train_loss,
-            ]
-        )
+    requests.put(
+        f"{URL}/train",
+        json=(
+            {
+                "step": step,
+                "batch": batch,
+                "train_accuracy": train_accuracy,
+                "train_loss": train_loss,
+            }
+        ),
+    )
 
     return (
         train_accuracy,
@@ -133,19 +135,19 @@ def write_data_val(
     val_accuracy,
     epoch,
     epoch_time,
-    filename=FILENAMES_DICT["log_val"],
 ):
-    with open(f"{LOGS_PATH}/{filename}", "a+", newline="") as file:
-        writer = csv.writer(file, delimiter=",")
-        writer.writerow(
-            [
-                step,
-                val_accuracy,
-                val_loss,
-                epoch,
-                epoch_time,
-            ]
-        )
+    requests.put(
+        f"{URL}/val",
+        json=(
+            {
+                "step": step,
+                "val_accuracy": val_accuracy,
+                "val_loss": val_loss,
+                "epoch": epoch,
+                "epoch_time": epoch_time,
+            }
+        ),
+    )
 
     return (
         val_accuracy,
@@ -185,8 +187,7 @@ def write_model_params(model, params, filename=FILENAMES_DICT["model_params"]):
             }
         )
 
-    with open(f"{LOGS_PATH}/{filename}", "a+", encoding="utf-8") as f:
-        json.dump(params, f, ensure_ascii=False, indent=4)
+    requests.put(f"{URL}/params", json=params)
 
     return params
 

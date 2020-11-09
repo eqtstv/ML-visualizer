@@ -1,5 +1,6 @@
 import json
 import pathlib
+import sys
 
 import dash_core_components as dcc
 import dash_html_components as html
@@ -8,6 +9,7 @@ import plotly.graph_objs as go
 from dash.dependencies import Input, Output
 
 from app import app, config
+from database.database import engine
 
 LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
 FILENAMES_DICT = config["filenames"]
@@ -189,34 +191,43 @@ def get_run_log(_):
     names_train = [
         "step",
         "batch",
-        "train accuracy",
-        "train loss",
+        "train_accuracy",
+        "train_loss",
     ]
     names_val = [
         "step",
-        "val accuracy",
-        "val loss",
+        "val_accuracy",
+        "val_loss",
         "epoch",
-        "epoch time",
+        "epoch_time",
     ]
 
     try:
-        df_train = pd.read_csv(
-            f"{LOGS_PATH}/{FILENAMES_DICT['log_train']}", names=names_train
-        )
-        df_val = pd.read_csv(
-            f"{LOGS_PATH}/{FILENAMES_DICT['log_val']}", names=names_val
-        )
+        with engine.connect() as connection:
+            df_train = pd.read_sql(
+                "SELECT step, batch, train_accuracy, train_loss FROM log_training",
+                connection,
+            )
+
+        with engine.connect() as connection:
+            df_val = pd.read_sql(
+                "SELECT step, val_accuracy, val_loss, epoch, epoch_time FROM log_validation",
+                connection,
+            )
+
         run_log_df = pd.merge(df_train, df_val, on="step", how="left")
         json = run_log_df.to_json(orient="split")
         return json
     except:
-        pass
+        e = sys.exc_info()
+        print(e)
 
     try:
-        df_train = pd.read_csv(
-            f"{LOGS_PATH}/{FILENAMES_DICT['log_train']}", names=names_train
-        )
+        with engine.connect() as connection:
+            df_train = pd.read_sql(
+                "SELECT step, batch, train_accuracy, train_loss FROM log_training",
+                connection,
+            )
         json = df_train.to_json(orient="split")
         return json
     except:
@@ -233,8 +244,8 @@ def update_accuracy_graph(run_log_json):
     graph = update_graph(
         "accuracy-graph",
         "Accuracy",
-        "train accuracy",
-        "val accuracy",
+        "train_accuracy",
+        "val_accuracy",
         run_log_json,
         "Accuracy",
     )
@@ -251,8 +262,8 @@ def update_loss_graph(run_log_json):
     graph = update_graph(
         "loss-graph",
         "Loss",
-        "train loss",
-        "val loss",
+        "train_loss",
+        "val_loss",
         run_log_json,
         "Loss",
     )
@@ -270,7 +281,7 @@ def update_div_current_accuracy_value(run_log_json):
             last_val_index = run_log_df["epoch"].last_valid_index()
             val_div = (
                 html.Div(
-                    f"Validation: {run_log_df['val accuracy'].iloc[last_val_index]:.4f}"
+                    f"Validation: {run_log_df['val_accuracy'].iloc[last_val_index]:.4f}"
                 ),
             )
             return [
@@ -282,7 +293,7 @@ def update_div_current_accuracy_value(run_log_json):
                         "margin-bottom": "0px",
                     },
                 ),
-                html.Div(f"Training: {run_log_df['train accuracy'].iloc[-1]:.4f}"),
+                html.Div(f"Training: {run_log_df['train_accuracy'].iloc[-1]:.4f}"),
                 val_div[0],
             ]
         return [
@@ -294,7 +305,7 @@ def update_div_current_accuracy_value(run_log_json):
                     "margin-bottom": "0px",
                 },
             ),
-            html.Div(f"Training: {run_log_df['train accuracy'].iloc[-1]:.4f}"),
+            html.Div(f"Training: {run_log_df['train_accuracy'].iloc[-1]:.4f}"),
         ]
 
 
@@ -309,7 +320,7 @@ def update_div_current_loss_value(run_log_json):
             last_val_index = run_log_df["epoch"].last_valid_index()
             val_div = (
                 html.Div(
-                    f"Validation: {run_log_df['val loss'].iloc[last_val_index]:.4f}"
+                    f"Validation: {run_log_df['val_loss'].iloc[last_val_index]:.4f}"
                 ),
             )
 
@@ -322,7 +333,7 @@ def update_div_current_loss_value(run_log_json):
                         "margin-bottom": "0px",
                     },
                 ),
-                html.Div(f"Training: {run_log_df['train loss'].iloc[-1]:.4f}"),
+                html.Div(f"Training: {run_log_df['train_loss'].iloc[-1]:.4f}"),
                 val_div[0],
             ]
         return [
@@ -334,7 +345,7 @@ def update_div_current_loss_value(run_log_json):
                     "margin-bottom": "0px",
                 },
             ),
-            html.Div(f"Training: {run_log_df['train loss'].iloc[-1]:.4f}"),
+            html.Div(f"Training: {run_log_df['train_loss'].iloc[-1]:.4f}"),
         ]
 
 
@@ -448,7 +459,7 @@ def update_div_step_display(run_log_json, model_stats):
             epoch = run_log_df["epoch"].iloc[last_val_index] + 1
             epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
 
-            et = run_log_df["epoch time"].iloc[last_val_index]
+            et = run_log_df["epoch_time"].iloc[last_val_index]
             eta = et * model_stats["epochs"]
             epoch_time_div = html.P(f"Epoch time: {et:.4f} s.")
             eta_div = html.P(f"Estimated training time: {eta:.4f} s.")
