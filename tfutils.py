@@ -9,10 +9,6 @@ import requests
 import tensorflow as tf
 from tensorflow import keras
 
-from app import config
-
-LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
-FILENAMES_DICT = config["filenames"]
 TRACKING_PRECISION = 0.01
 URL = "http://192.168.0.158:5050"
 
@@ -58,7 +54,7 @@ class LiveLearningTracking(keras.callbacks.Callback):
         self.step = 0
 
     def on_train_begin(self, logs=None):
-        clear_logs(LOGS_PATH, FILENAMES_DICT)
+        requests.delete(f"{URL}/clear")
         param_tracker.get_model_parameters(self.params["steps"])
 
         write_model_params(self.model, self.params)
@@ -155,29 +151,7 @@ def write_data_val(
     )
 
 
-def write_model_summary(
-    model,
-    filename1=FILENAMES_DICT["model_summary"],
-    filename2=FILENAMES_DICT["layers_summary"],
-):
-    model_summary = str(model.to_json())
-    layer_params = {
-        "layers": [
-            (layer.get_config(), {"no_params": layer.count_params()})
-            for layer in model.layers
-        ]
-    }
-
-    with open(f"{LOGS_PATH}/{filename1}", "a+", newline="") as file:
-        file.write(model_summary)
-
-    with open(f"{LOGS_PATH}/{filename2}", "a+", newline="") as file:
-        json.dump(layer_params, file, ensure_ascii=False, indent=4)
-
-    return model.summary()
-
-
-def write_model_params(model, params, filename=FILENAMES_DICT["model_params"]):
+def write_model_params(model, params):
     if params:
         params.update(param_tracker.write_parameters())
         params.update(
@@ -192,7 +166,15 @@ def write_model_params(model, params, filename=FILENAMES_DICT["model_params"]):
     return params
 
 
-def clear_logs(folder, files):
-    for key, filename in files.items():
-        if os.path.exists(f"{folder}/{filename}"):
-            os.remove(f"{folder}/{filename}")
+def write_model_summary(model):
+    model_summary = str(model.to_json())
+    layer_params = {
+        "layers": [
+            (layer.get_config(), {"no_params": layer.count_params()})
+            for layer in model.layers
+        ]
+    }
+    requests.put(f"{URL}/summary", json=json.loads(model_summary))
+    requests.put(f"{URL}/layers", json=layer_params)
+
+    return model.summary()

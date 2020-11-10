@@ -12,35 +12,61 @@ from database.models import LogTraining, LogValidation
 from layout import app_layout
 
 app.layout = app_layout
-LOGS_PATH = f"{pathlib.Path(__file__).parent.resolve()}/{config['logs_folder']}"
 
 
-def clear_data(session):
-    meta = Base.metadata
-    for table in reversed(meta.sorted_tables):
-        print(f"Clear table {table}")
-        session.execute(table.delete())
-    session.commit()
+@api.resource("/clear")
+class ClearData(Resource):
+    def delete(self):
+        meta = Base.metadata
+        for table in reversed(meta.sorted_tables):
+            db_session.execute(table.delete())
+        db_session.commit()
 
 
 @api.resource("/params")
-class TodoSimple(Resource):
+class ModelParams(Resource):
     data = {}
-    filename = config["filenames"]["model_params"]
 
     def get(self):
-        print("GET")
         return self.data
 
     def put(self):
         try:
-            clear_data(db_session)
-            print("PUT")
             self.data.update(request.json)
-            print(self.data)
+        except:
+            e = sys.exc_info()
+            print(e)
 
-            with open(f"{LOGS_PATH}/{self.filename}", "a+", encoding="utf-8") as f:
-                json.dump(self.data, f, ensure_ascii=False, indent=4)
+        return jsonify(self.data)
+
+
+@api.resource("/summary")
+class ModelSummary(Resource):
+    data = {}
+
+    def get(self):
+        return self.data
+
+    def put(self):
+        try:
+            self.data.update(request.json)
+        except:
+            e = sys.exc_info()
+            print(e)
+
+        return jsonify(self.data)
+
+
+@api.resource("/layers")
+class ModelLayers(Resource):
+    data = {}
+
+    def get(self):
+        return self.data
+
+    def put(self):
+        try:
+            self.data.update(request.json)
         except:
             e = sys.exc_info()
             print(e)
@@ -88,4 +114,4 @@ class ValidationLog(Resource):
 
 
 if __name__ == "__main__":
-    app.run_server(host="192.168.0.158", port="5050", debug=True)
+    app.run_server(host=f"{config['ip']}", port=f"{config['port']}", debug=True)
