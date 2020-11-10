@@ -50,7 +50,7 @@ param_tracker = ParametersTracker()
 
 
 class LiveLearningTracking(keras.callbacks.Callback):
-    def __init__(self, tracking_precision=0.01):
+    def __init__(self, tracking_precision=0.05):
         param_tracker.tracking_precision = tracking_precision
         self.step = 0
 
