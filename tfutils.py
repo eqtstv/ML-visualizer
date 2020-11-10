@@ -10,7 +10,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 TRACKING_PRECISION = 0.01
-URL = "http://192.168.0.158:5050"
+URL = "http://192.168.0.206:5050"
 
 
 class Singleton(type):
@@ -92,13 +92,14 @@ class LiveLearningTracking(keras.callbacks.Callback):
             logs["accuracy"],
             logs["loss"],
         )
-        write_data_val(
-            self.step,
-            logs["val_accuracy"],
-            logs["val_loss"],
-            self.epoch,
-            0,
-        )
+        if "val_loss" in logs.keys():
+            write_data_val(
+                self.step,
+                logs["val_accuracy"],
+                logs["val_loss"],
+                self.epoch,
+                0,
+            )
 
 
 def write_data_train(
