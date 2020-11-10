@@ -9,7 +9,7 @@ import requests
 import tensorflow as tf
 from tensorflow import keras
 
-TRACKING_PRECISION = 0.01
+
 URL = "http://192.168.0.206:5050"
 
 
@@ -23,8 +23,8 @@ class Singleton(type):
 
 
 class ParametersTracker(metaclass=Singleton):
-    def __init__(self, tracking_precision):
-        self.tracking_precision = tracking_precision
+    def __init__(self):
+        self.tracking_precision = 0
 
     def get_model_parameters(self, no_steps):
         self.no_steps = no_steps
@@ -46,11 +46,12 @@ class ParametersTracker(metaclass=Singleton):
         }
 
 
-param_tracker = ParametersTracker(TRACKING_PRECISION)
+param_tracker = ParametersTracker()
 
 
 class LiveLearningTracking(keras.callbacks.Callback):
-    def __init__(self):
+    def __init__(self, tracking_precision):
+        param_tracker.tracking_precision = tracking_precision
         self.step = 0
 
     def on_train_begin(self, logs=None):
