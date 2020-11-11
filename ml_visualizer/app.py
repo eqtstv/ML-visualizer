@@ -1,11 +1,12 @@
 import json
 import pathlib
-from flask import Flask, request
-from flask_restful import Resource, Api
-from ml_visualizer.database.database import init_db
 
 import dash
 import dash_bootstrap_components as dbc
+from flask import Flask, request
+from flask_restful import Api, Resource
+
+from ml_visualizer.database.database import init_db
 
 server = Flask("my_app")
 api = Api(server)
