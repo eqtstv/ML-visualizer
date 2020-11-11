@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float
-from database.database import Base
+from ml_visualizer.database.database import Base
 
 
 class LogTraining(Base):

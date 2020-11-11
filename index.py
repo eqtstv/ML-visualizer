@@ -5,11 +5,11 @@ import sys
 from flask import Flask, jsonify, request
 from flask_restful import Resource
 
-import callbacks
-from app import api, app, config, server
-from database.database import Base, db_session
-from database.models import LogTraining, LogValidation
-from layout import app_layout
+import ml_visualizer.callbacks
+from ml_visualizer.app import api, app, config, server
+from ml_visualizer.database.database import Base, db_session
+from ml_visualizer.database.models import LogTraining, LogValidation
+from ml_visualizer.layout import app_layout
 
 app.layout = app_layout
 

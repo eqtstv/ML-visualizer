@@ -9,8 +9,8 @@ import plotly.graph_objs as go
 import requests
 from dash.dependencies import Input, Output
 
-from app import app, config
-from database.database import engine
+from ml_visualizer.app import app, config
+from ml_visualizer.database.database import engine
 
 URL = f"http://{config['ip']}:{config['port']}"
 
