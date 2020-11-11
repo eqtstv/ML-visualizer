@@ -1,12 +1,10 @@
-import json
-import pathlib
 import sys
 
-from flask import Flask, jsonify, request
+from flask import jsonify, request
 from flask_restful import Resource
 
 import ml_visualizer.callbacks
-from ml_visualizer.app import api, app, config, server
+from ml_visualizer.app import api, app, config
 from ml_visualizer.database.database import Base, db_session
 from ml_visualizer.database.models import LogTraining, LogValidation
 from ml_visualizer.layout import app_layout
