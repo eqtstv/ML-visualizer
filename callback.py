@@ -49,7 +49,17 @@ class ParametersTracker(metaclass=Singleton):
 param_tracker = ParametersTracker()
 
 
-class LiveLearningTracking(keras.callbacks.Callback):
+class MLVisualizer(keras.callbacks.Callback):
+    """
+    Connect to MLVisualizer server
+
+    Args:
+        tracking_precision: Tracking precision of your learning process
+
+    Returns:
+        keras.callbacks.Callback
+    """
+
     def __init__(self, tracking_precision=0.05):
         param_tracker.tracking_precision = tracking_precision
         self.step = 0
