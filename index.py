@@ -1,5 +1,6 @@
 import sys
 
+import ml_visualizer.callbacks
 from ml_visualizer.app import api, app, config
 from ml_visualizer.layout import app_layout
 from ml_visualizer.resources.data import ClearData
