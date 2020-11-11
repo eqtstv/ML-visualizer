@@ -115,7 +115,7 @@ app_layout = dbc.Container(
             ),
             dcc.Interval(id="interval-log-update", n_intervals=0),
             dcc.Store(id="run-log-storage", storage_type="memory"),
-            dcc.Store(id="model-stats-storage", storage_type="memory"),
+            dcc.Store(id="model-params-storage", storage_type="memory"),
         ],
     ),
     fluid=True,
