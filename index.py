@@ -3,7 +3,7 @@ import sys
 import ml_visualizer.callbacks
 from ml_visualizer.app import api, app, config
 from ml_visualizer.layout import app_layout
-from ml_visualizer.resources.clear_data import ClearData
+from ml_visualizer.resources.data import ClearData
 from ml_visualizer.resources.logs import TrainingLog, ValidationLog
 from ml_visualizer.resources.model import ModelLayers, ModelParams, ModelSummary
 
