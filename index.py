@@ -1,114 +1,20 @@
 import sys
 
-from flask import jsonify, request
-from flask_restful import Resource
-
 import ml_visualizer.callbacks
 from ml_visualizer.app import api, app, config
-from ml_visualizer.database.database import Base, db_session
-from ml_visualizer.database.models import LogTraining, LogValidation
 from ml_visualizer.layout import app_layout
+from ml_visualizer.resources.clear_data import ClearData
+from ml_visualizer.resources.logs import TrainingLog, ValidationLog
+from ml_visualizer.resources.model import ModelLayers, ModelParams, ModelSummary
 
 app.layout = app_layout
 
-
-@api.resource("/clear")
-class ClearData(Resource):
-    def delete(self):
-        meta = Base.metadata
-        for table in reversed(meta.sorted_tables):
-            db_session.execute(table.delete())
-        db_session.commit()
-
-
-@api.resource("/params")
-class ModelParams(Resource):
-    data = {}
-
-    def get(self):
-        return self.data
-
-    def put(self):
-        try:
-            self.data.update(request.json)
-        except:
-            e = sys.exc_info()
-            print(e)
-
-        return jsonify(self.data)
-
-
-@api.resource("/summary")
-class ModelSummary(Resource):
-    data = {}
-
-    def get(self):
-        return self.data
-
-    def put(self):
-        try:
-            self.data.update(request.json)
-        except:
-            e = sys.exc_info()
-            print(e)
-
-        return jsonify(self.data)
-
-
-@api.resource("/layers")
-class ModelLayers(Resource):
-    data = {}
-
-    def get(self):
-        return self.data
-
-    def put(self):
-        try:
-            self.data.update(request.json)
-        except:
-            e = sys.exc_info()
-            print(e)
-
-        return jsonify(self.data)
-
-
-@api.resource("/train")
-class TrainingLog(Resource):
-    def put(self):
-        try:
-            data = request.json
-            train_log = LogTraining(
-                data["step"],
-                data["batch"],
-                data["train_loss"],
-                data["train_accuracy"],
-            )
-            db_session.add(train_log)
-            db_session.commit()
-
-        except:
-            e = sys.exc_info()
-            print(e)
-
-
-@api.resource("/val")
-class ValidationLog(Resource):
-    def put(self):
-        try:
-            data = request.json
-            val_log = LogValidation(
-                data["step"],
-                data["val_loss"],
-                data["val_accuracy"],
-                data["epoch"],
-                data["epoch_time"],
-            )
-            db_session.add(val_log)
-            db_session.commit()
-
-        except:
-            e = sys.exc_info()
-            print(e)
+api.add_resource(ClearData, "/clear")
+api.add_resource(ModelParams, "/params")
+api.add_resource(ModelSummary, "/summary")
+api.add_resource(ModelLayers, "/layers")
+api.add_resource(TrainingLog, "/train")
+api.add_resource(ValidationLog, "/val")
 
 
 if __name__ == "__main__":
