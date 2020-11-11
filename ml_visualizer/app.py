@@ -3,8 +3,8 @@ import pathlib
 
 import dash
 import dash_bootstrap_components as dbc
-from flask import Flask, request
-from flask_restful import Api, Resource
+from flask import Flask
+from flask_restful import Api
 
 from ml_visualizer.database.database import init_db
 
