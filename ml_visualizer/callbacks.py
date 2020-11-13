@@ -9,6 +9,7 @@ from ml_visualizer.callbacks_utils import (
     get_layers,
     update_current_value,
     update_graph,
+    update_interval_log,
 )
 from ml_visualizer.database.database import engine
 
@@ -20,17 +21,7 @@ URL = f"http://{config['ip']}:{config['port']}"
     [Input("dropdown-interval-control", "value")],
 )
 def update_interval_log_update(interval_rate):
-    if interval_rate == "fast":
-        return 500
-
-    elif interval_rate == "regular":
-        return 1000
-
-    elif interval_rate == "slow":
-        return 5 * 1000
-
-    elif interval_rate == "no":
-        return 24 * 60 * 60 * 1000
+    return update_interval_log(interval_rate)
 
 
 @app.callback(

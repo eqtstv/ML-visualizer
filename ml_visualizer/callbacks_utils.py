@@ -211,3 +211,17 @@ def get_layers(summary):
         layers.append(get_layer_info(layer))
 
     return layers
+
+
+def update_interval_log(interval_rate):
+    if interval_rate == "fast":
+        return 500
+
+    elif interval_rate == "regular":
+        return 1000
+
+    elif interval_rate == "slow":
+        return 5 * 1000
+
+    elif interval_rate == "no":
+        return 24 * 60 * 60 * 1000
