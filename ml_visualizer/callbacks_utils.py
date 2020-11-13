@@ -296,3 +296,46 @@ def update_progress_display(run_log_json, model_stats):
                 children=[steps_div[0], epochs_div, tracking_precision],
                 className="learning-stats",
             )
+
+
+def get_model_summary_divs(run_log_json, model_stats, model_summary):
+    if model_summary and model_stats:
+        input_layer_info = get_input_layer_info(model_summary)
+        layers_info = get_layers(model_summary)
+
+        model_class_name_div = html.Div(
+            children=[
+                html.P("Model:"),
+                html.P(f"Type: {model_summary['class_name']}"),
+                html.P(f"Name: {model_summary['config']['name']}"),
+            ],
+            className="model-summary",
+        )
+
+        model_input_layer_info_div = html.Div(
+            children=[
+                html.P(f"Input shape:"),
+                html.P(f"{input_layer_info['input_shape']}"),
+                html.P(f"Output:"),
+                html.P(f"Units: {layers_info[-1]['units']}"),
+                html.P(f"Activation: {layers_info[-1]['activation']}"),
+            ],
+            className="model-summary",
+        )
+
+        model_layers_div = html.Div(
+            children=[html.P("Layers:"), html.Div(layers_info)],
+            className="model-summary",
+        )
+
+        model_layers_info = html.Div(
+            children=[
+                html.P("Number of layers:"),
+                html.P(len(layers_info) - 1),
+                html.P("Total params:"),
+                html.P(model_stats["total_params"]),
+            ],
+            className="model-summary",
+        )
+
+        return model_class_name_div, model_layers_info, model_input_layer_info_div
