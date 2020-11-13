@@ -18,22 +18,15 @@ def write_data_train(
     train_loss,
     train_accuracy,
 ):
-    requests.put(
-        f"{URL}/train",
-        json=(
-            {
-                "step": step,
-                "batch": batch,
-                "train_accuracy": train_accuracy,
-                "train_loss": train_loss,
-            }
-        ),
-    )
+    train_data = {
+        "step": step,
+        "batch": batch,
+        "train_accuracy": train_accuracy,
+        "train_loss": train_loss,
+    }
+    requests.put(f"{URL}/train", json=train_data)
 
-    return (
-        train_accuracy,
-        train_loss,
-    )
+    return train_data
 
 
 def write_data_val(
@@ -43,23 +36,17 @@ def write_data_val(
     epoch,
     epoch_time,
 ):
-    requests.put(
-        f"{URL}/val",
-        json=(
-            {
-                "step": step,
-                "val_accuracy": val_accuracy,
-                "val_loss": val_loss,
-                "epoch": epoch,
-                "epoch_time": epoch_time,
-            }
-        ),
-    )
+    val_data = {
+        "step": step,
+        "val_accuracy": val_accuracy,
+        "val_loss": val_loss,
+        "epoch": epoch,
+        "epoch_time": epoch_time,
+    }
 
-    return (
-        val_accuracy,
-        val_loss,
-    )
+    requests.put(f"{URL}/val", json=val_data)
+
+    return val_data
 
 
 def write_model_params(model, param_tracker):
@@ -89,7 +76,7 @@ def write_model_summary(model):
     requests.put(f"{URL}/summary", json=json.loads(model_summary))
     requests.put(f"{URL}/layers", json=layer_params)
 
-    return model.summary()
+    return model.to_json(), layer_params
 
 
 def clear_training_data():
