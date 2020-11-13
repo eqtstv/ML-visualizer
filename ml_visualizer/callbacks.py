@@ -125,28 +125,28 @@ def update_div_current_loss_value(run_log_json):
 
 @app.callback(
     Output("div-model-summary", "children"),
-    [Input("run-log-storage", "data"), Input("model-params-storage", "data")],
+    [Input("model-params-storage", "data")],
 )
-def update_model_summary_divs(run_log_json, model_stats):
+def update_model_summary_divs(model_params):
     model_summary = requests.get(f"{URL}/summary").json()
 
-    return get_model_summary_divs(run_log_json, model_stats, model_summary)
+    return get_model_summary_divs(model_params, model_summary)
 
 
 @app.callback(
     Output("div-model-params", "children"), [Input("model-params-storage", "data")]
 )
-def get_model_params_div(model_stats):
+def get_model_params_div(model_params):
     pass
-    # return html.Div(html.P(str(model_stats)))
+    # return html.Div(html.P(str(model_params)))
 
 
 @app.callback(
     Output("div-epoch-step-display", "children"),
     [Input("run-log-storage", "data"), Input("model-params-storage", "data")],
 )
-def update_div_step_display(run_log_json, model_stats):
-    return update_progress_display(run_log_json, model_stats)
+def update_div_step_display(run_log_json, model_params):
+    return update_progress_display(run_log_json, model_params)
 
 
 @app.callback(
@@ -158,5 +158,5 @@ def update_div_step_display(run_log_json, model_stats):
     ],
     [Input("run-log-storage", "data"), Input("model-params-storage", "data")],
 )
-def update_progress(run_log_json, model_stats):
-    return update_progress_bars(run_log_json, model_stats)
+def update_progress(run_log_json, model_params):
+    return update_progress_bars(run_log_json, model_params)

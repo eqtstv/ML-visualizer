@@ -7,11 +7,15 @@ import plotly
 from ml_visualizer.callbacks_utils import (
     get_input_layer_info,
     get_layers,
+    get_model_summary_divs,
     update_current_value,
     update_graph,
+    update_interval_log,
+    update_progress_bars,
+    update_progress_display,
 )
 
-run_log_json_no_val = {
+run_log_json_no_validation = {
     "columns": [
         "step",
         "batch",
@@ -28,7 +32,7 @@ run_log_json_no_val = {
         [1, 10, 0.2, 2.2, None, None, None, None],
     ],
 }
-run_log_json_with_val = {
+run_log_json_with_validation = {
     "columns": [
         "step",
         "batch",
@@ -120,6 +124,17 @@ model_summary = {
     "backend": "tensorflow",
 }
 
+model_params = {
+    "tracking_precision": 0.01,
+    "no_steps": 1000,
+    "epochs": 10,
+    "batch_split": 100,
+    "max_batch_step": 900,
+    "steps_in_batch": 10,
+    "no_tracked_steps": 100,
+    "total_params": 101770,
+}
+
 
 class TestUpdateGraph(unittest.TestCase):
     def test_graph_names(self):
@@ -129,7 +144,7 @@ class TestUpdateGraph(unittest.TestCase):
             "Example Graph",
             "train_accuracy",
             "train_val",
-            json.dumps(run_log_json_no_val),
+            json.dumps(run_log_json_no_validation),
             "Example_axis",
         ]
 
@@ -147,7 +162,7 @@ class TestUpdateGraph(unittest.TestCase):
             "Example Graph",
             "train_accuracy",
             "train_val",
-            json.dumps(run_log_json_no_val),
+            json.dumps(run_log_json_no_validation),
             "Example_axis",
         ]
 
@@ -165,7 +180,7 @@ class TestUpdateCurrentValueAccuracy(unittest.TestCase):
             "train_accuracy",
             "val_accuracy",
             "Accuracy",
-            json.dumps(run_log_json_no_val),
+            json.dumps(run_log_json_no_validation),
         ]
 
         # WHEN update_current_value is ran with that input
@@ -181,7 +196,7 @@ class TestUpdateCurrentValueAccuracy(unittest.TestCase):
             "train_accuracy",
             "val_accuracy",
             "Accuracy",
-            json.dumps(run_log_json_with_val),
+            json.dumps(run_log_json_with_validation),
         ]
 
         # WHEN update_current_value is ran with that input
@@ -200,7 +215,7 @@ class TestUpdateCurrentValueLoss(unittest.TestCase):
             "train_loss",
             "val_loss",
             "Loss",
-            json.dumps(run_log_json_no_val),
+            json.dumps(run_log_json_no_validation),
         ]
 
         # WHEN update_current_value is ran with that input
@@ -216,7 +231,7 @@ class TestUpdateCurrentValueLoss(unittest.TestCase):
             "train_loss",
             "val_loss",
             "Loss",
-            json.dumps(run_log_json_with_val),
+            json.dumps(run_log_json_with_validation),
         ]
 
         # WHEN update_current_value is ran with that input
@@ -257,3 +272,147 @@ class TestGetLayers(unittest.TestCase):
             {"Type": "Dense", "name": "dense_1", "units": 10, "activation": "linear"},
         ]
         self.assertEqual(result, valid_result)
+
+
+class TestIntervalLog(unittest.TestCase):
+    def test_update_interval_log(self):
+        # GIVEN known inputs
+        inputs = ["fast", "regular", "slow", "no"]
+        results = [500, 1000, 5000, 86400000]
+
+        # WHEN update_interval_log() is ran with that input
+        result1 = update_interval_log(inputs[0])
+        result2 = update_interval_log(inputs[1])
+        result3 = update_interval_log(inputs[2])
+        result4 = update_interval_log(inputs[3])
+
+        # THEN it should return valid results
+        self.assertEqual(result1, results[0])
+        self.assertEqual(result2, results[1])
+        self.assertEqual(result3, results[2])
+        self.assertEqual(result4, results[3])
+
+
+class TestProgressBars(unittest.TestCase):
+    def test_update_progress_bars_no_validation(self):
+        # GIVEN known inputs
+        # WHEN update_progress_bars() is ran with that input
+        result = update_progress_bars(
+            json.dumps(run_log_json_no_validation), model_params
+        )
+
+        # THEN it should return valid results
+        valid_result = (1.1111111111111112, "", 1.0, "")
+
+        self.assertEqual(result, valid_result)
+
+    def test_update_progress_bars_with_validation(self):
+        # GIVEN known inputs
+        # WHEN update_progress_bars() is ran with that input
+        result = update_progress_bars(
+            json.dumps(run_log_json_with_validation), model_params
+        )
+
+        # THEN it should return valid results
+        valid_result = (83.33333333333333, "83 %", 2.0, "")
+
+        self.assertEqual(result, valid_result)
+
+    def test_update_progress_bars_no_json(self):
+        # GIVEN no run_log_json
+        # WHEN update_progress_bars() is ran with that input
+        result = update_progress_bars({}, model_params)
+
+        # THEN it should return valid results
+        valid_result = (0, 0, 0, 0)
+
+        self.assertEqual(result, valid_result)
+
+
+class TestProgressDisplay(unittest.TestCase):
+    def test_update_progress_display_no_validation(self):
+        # GIVEN known inputs
+        # WHEN update_progress_display() is ran with that input
+        result = update_progress_display(
+            json.dumps(run_log_json_no_validation), model_params
+        )
+
+        # THEN it should return valid results
+        valid_result = [
+            html.P("Batch: 110 / 1000"),
+            html.P("Epoch: 1 / 10"),
+            html.P("Tracking precision: 0.01"),
+        ]
+
+        self.assertEqual(result.children[0].children, valid_result[0].children)
+        self.assertEqual(result.children[1].children, valid_result[1].children)
+        self.assertEqual(result.children[2].children, valid_result[2].children)
+
+    def test_update_progress_display_with_validation(self):
+        # GIVEN known inputs
+        # WHEN update_progress_display() is ran with that input
+        result = update_progress_display(
+            json.dumps(run_log_json_with_validation), model_params
+        )
+
+        # THEN it should return valid results
+        valid_result = [
+            html.P("Batch: 850 / 1000"),
+            html.P("Epoch: 2 / 10"),
+            html.P("Tracking precision: 0.01"),
+        ]
+
+        self.assertEqual(result.children[0].children, valid_result[0].children)
+        self.assertEqual(result.children[1].children, valid_result[1].children)
+        self.assertEqual(result.children[2].children, valid_result[2].children)
+
+
+class TestModelSummaryDivs(unittest.TestCase):
+    def test_no_model_params(self):
+        result = get_model_summary_divs({}, model_summary)
+        self.assertEqual(result, None)
+
+    def test_no_model_summary(self):
+        result = get_model_summary_divs(model_params, {})
+        self.assertEqual(result, None)
+
+    def test_model_summary(self):
+        # GIVEN known inputs
+        # WHEN get_model_summary_divs() is ran with that input
+        result = get_model_summary_divs(model_params, model_summary)
+
+        valid_result = (
+            html.Div(
+                children=[
+                    html.P("Model:"),
+                    html.P("Type: Sequential"),
+                    html.P("Name: sequential"),
+                ],
+                className="model-summary",
+            ),
+            html.Div(
+                children=[
+                    html.P("Number of layers:"),
+                    html.P(3),
+                    html.P("Total params:"),
+                    html.P(101770),
+                ],
+                className="model-summary",
+            ),
+            html.Div(
+                children=[
+                    html.P("Input shape:"),
+                    html.P("[None, 28, 28]"),
+                    html.P("Output:"),
+                    html.P("Units: 10"),
+                    html.P("Activation: linear"),
+                ],
+                className="model-summary",
+            ),
+        )
+
+        for i in range(len(result)):
+            for j in range(len(result[i].children)):
+                self.assertEqual(
+                    result[i].children[j].children, valid_result[i].children[j].children
+                )

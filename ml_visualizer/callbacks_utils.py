@@ -227,15 +227,15 @@ def update_interval_log(interval_rate):
         return 24 * 60 * 60 * 1000
 
 
-def update_progress_bars(run_log_json, model_stats):
+def update_progress_bars(run_log_json, model_params):
     if run_log_json:
         run_log_df = pd.read_json(run_log_json, orient="split")
-        if len(run_log_df["batch"]) != 0 and model_stats:
+        if len(run_log_df["batch"]) != 0 and model_params:
             batch_prog = (
-                (run_log_df["batch"].iloc[-1]) * 100 / model_stats["max_batch_step"]
+                (run_log_df["batch"].iloc[-1]) * 100 / model_params["max_batch_step"]
             )
             step_prog = (
-                run_log_df["step"].iloc[-1] * 100 / model_stats["no_tracked_steps"]
+                run_log_df["step"].iloc[-1] * 100 / model_params["no_tracked_steps"]
             )
 
             return (
@@ -248,38 +248,38 @@ def update_progress_bars(run_log_json, model_stats):
     return 0, 0, 0, 0
 
 
-def update_progress_display(run_log_json, model_stats):
+def update_progress_display(run_log_json, model_params):
     steps_div = ()
 
     if run_log_json:
         run_log_df = pd.read_json(run_log_json, orient="split")
 
-        if len(run_log_df["batch"]) != 0 and model_stats:
-            residue = model_stats["no_steps"] - model_stats["max_batch_step"]
+        if len(run_log_df["batch"]) != 0 and model_params:
+            residue = model_params["no_steps"] - model_params["max_batch_step"]
 
             if residue == 0:
-                residue = model_stats["batch_split"]
+                residue = model_params["batch_split"]
 
             steps_div = (
                 html.P(
-                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_stats['no_steps']}"
+                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_params['no_steps']}"
                 ),
             )
 
-            epochs_div = html.P(f"Epoch: {1:.0f} / {model_stats['epochs']}")
+            epochs_div = html.P(f"Epoch: {1:.0f} / {model_params['epochs']}")
 
             tracking_precision = html.P(
-                f"Tracking precision: {model_stats['tracking_precision']}"
+                f"Tracking precision: {model_params['tracking_precision']}"
             )
 
-        if run_log_df["epoch"].last_valid_index() and model_stats:
+        if run_log_df["epoch"].last_valid_index() and model_params:
             last_val_index = run_log_df["epoch"].last_valid_index()
             epoch = run_log_df["epoch"].iloc[last_val_index] + 1
 
             et = run_log_df["epoch_time"].iloc[last_val_index]
-            eta = et * model_stats["epochs"]
+            eta = et * model_params["epochs"]
 
-            epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
+            epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_params['epochs']}")
             epoch_time_div = html.P(f"Epoch time: {et:.4f} s.")
             eta_div = html.P(f"Estimated training time: {eta:.4f} s.")
 
@@ -291,15 +291,15 @@ def update_progress_display(run_log_json, model_stats):
                 ],
                 className="learning-stats",
             )
-        if model_stats and len(steps_div) > 0:
+        if model_params and len(steps_div) > 0:
             return html.Div(
                 children=[steps_div[0], epochs_div, tracking_precision],
                 className="learning-stats",
             )
 
 
-def get_model_summary_divs(run_log_json, model_stats, model_summary):
-    if model_summary and model_stats:
+def get_model_summary_divs(model_params, model_summary):
+    if model_summary and model_params:
         input_layer_info = get_input_layer_info(model_summary)
         layers_info = get_layers(model_summary)
 
@@ -333,7 +333,7 @@ def get_model_summary_divs(run_log_json, model_stats, model_summary):
                 html.P("Number of layers:"),
                 html.P(len(layers_info) - 1),
                 html.P("Total params:"),
-                html.P(model_stats["total_params"]),
+                html.P(model_params["total_params"]),
             ],
             className="model-summary",
         )
