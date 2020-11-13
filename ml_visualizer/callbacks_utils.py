@@ -225,3 +225,24 @@ def update_interval_log(interval_rate):
 
     elif interval_rate == "no":
         return 24 * 60 * 60 * 1000
+
+
+def update_progress_bars(run_log_json, model_stats):
+    if run_log_json:
+        run_log_df = pd.read_json(run_log_json, orient="split")
+        if len(run_log_df["batch"]) != 0 and model_stats:
+            batch_prog = (
+                (run_log_df["batch"].iloc[-1]) * 100 / model_stats["max_batch_step"]
+            )
+            step_prog = (
+                run_log_df["step"].iloc[-1] * 100 / model_stats["no_tracked_steps"]
+            )
+
+            return (
+                batch_prog,
+                f"{batch_prog:.0f} %" if batch_prog >= 5 else "",
+                step_prog,
+                f"{step_prog:.0f} %" if step_prog >= 5 else "",
+            )
+
+    return 0, 0, 0, 0
