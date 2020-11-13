@@ -152,7 +152,7 @@ def update_current_value(value_train, value_validation, value_title, run_log_jso
 
             val_div = (
                 html.Div(
-                    f"{value_title}: {run_log_df[value_validation].iloc[last_val_index]:.4f}"
+                    f"Validation: {run_log_df[value_validation].iloc[last_val_index]:.4f}"
                 ),
             )
             return [
