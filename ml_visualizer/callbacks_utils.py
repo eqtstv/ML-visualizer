@@ -246,3 +246,53 @@ def update_progress_bars(run_log_json, model_stats):
             )
 
     return 0, 0, 0, 0
+
+
+def update_progress_display(run_log_json, model_stats):
+    steps_div = ()
+
+    if run_log_json:
+        run_log_df = pd.read_json(run_log_json, orient="split")
+
+        if len(run_log_df["batch"]) != 0 and model_stats:
+            residue = model_stats["no_steps"] - model_stats["max_batch_step"]
+
+            if residue == 0:
+                residue = model_stats["batch_split"]
+
+            steps_div = (
+                html.P(
+                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_stats['no_steps']}"
+                ),
+            )
+
+            epochs_div = html.P(f"Epoch: {1:.0f} / {model_stats['epochs']}")
+
+            tracking_precision = html.P(
+                f"Tracking precision: {model_stats['tracking_precision']}"
+            )
+
+        if run_log_df["epoch"].last_valid_index() and model_stats:
+            last_val_index = run_log_df["epoch"].last_valid_index()
+            epoch = run_log_df["epoch"].iloc[last_val_index] + 1
+
+            et = run_log_df["epoch_time"].iloc[last_val_index]
+            eta = et * model_stats["epochs"]
+
+            epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_stats['epochs']}")
+            epoch_time_div = html.P(f"Epoch time: {et:.4f} s.")
+            eta_div = html.P(f"Estimated training time: {eta:.4f} s.")
+
+            return html.Div(
+                children=[
+                    steps_div[0],
+                    epochs_div,
+                    tracking_precision,
+                ],
+                className="learning-stats",
+            )
+        if model_stats and len(steps_div) > 0:
+            return html.Div(
+                children=[steps_div[0], epochs_div, tracking_precision],
+                className="learning-stats",
+            )
