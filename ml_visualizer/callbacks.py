@@ -37,6 +37,17 @@ def get_model_params(_):
 
 
 @app.callback(
+    Output("model-summary-storage", "data"),
+    [Input("interval-log-update", "n_intervals")],
+)
+def get_model_params(_):
+    try:
+        return requests.get(f"{URL}/summary").json()
+    except:
+        return None
+
+
+@app.callback(
     Output("run-log-storage", "data"), [Input("interval-log-update", "n_intervals")]
 )
 def get_run_log(_):
@@ -125,11 +136,9 @@ def update_div_current_loss_value(run_log_json):
 
 @app.callback(
     Output("div-model-summary", "children"),
-    [Input("model-params-storage", "data")],
+    [Input("model-params-storage", "data"), Input("model-summary-storage", "data")],
 )
-def update_model_summary_divs(model_params):
-    model_summary = requests.get(f"{URL}/summary").json()
-
+def update_model_summary_divs(model_params, model_summary):
     return get_model_summary_divs(model_params, model_summary)
 
 
