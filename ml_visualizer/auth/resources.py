@@ -158,3 +158,11 @@ class NotLogged(Resource):
             200,
             {"Content-Type": "text/html"},
         )
+
+
+class DashApp(Resource):
+    @login_required
+    def get(self):
+        return make_response(
+            render_template("dash_app.html"), 200, {"Content-Type": "text/html"}
+        )

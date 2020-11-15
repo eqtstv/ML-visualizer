@@ -17,6 +17,7 @@ from ml_visualizer.auth.resources import (
     Profile,
     Signup,
     login_manager,
+    DashApp,
 )
 from ml_visualizer.database.database import init_db
 from ml_visualizer.resources.data import ClearData
@@ -45,6 +46,7 @@ api.add_resource(Signup, "/signup")
 api.add_resource(Logout, "/logout")
 api.add_resource(Profile, "/profile")
 api.add_resource(NotLogged, "/notlogged")
+api.add_resource(DashApp, "/dashapp")
 
 api.add_resource(ClearData, "/clear")
 api.add_resource(ModelParams, "/params")
@@ -54,4 +56,9 @@ api.add_resource(TrainingLog, "/train")
 api.add_resource(ValidationLog, "/val")
 
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
+app = dash.Dash(
+    __name__,
+    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    server=server,
+    url_base_pathname="/dash_app/",
+)

@@ -9,7 +9,12 @@ import requests
 import tensorflow as tf
 from tensorflow import keras
 
-URL = "http://192.168.0.206:5050"
+
+# leave it for tests
+# Change it when connecting models
+from ml_visualizer.app import config
+
+URL = f"http://{config['ip']}:{config['port']}"
 
 
 def write_data_train(
