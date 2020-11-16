@@ -27,6 +27,8 @@ def update_graph(
     layout = go.Layout(
         template="plotly_dark",
         title_text=graph_title,
+        paper_bgcolor="rgb(16, 24, 32)",
+        plot_bgcolor="rgb(16, 24, 32)",
     )
 
     fig = go.Figure(data=[trace_train, trace_val], layout=layout)
