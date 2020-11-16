@@ -31,9 +31,7 @@ def load_user(user_id):
 class Index(Resource):
     def get(self):
         return make_response(
-            render_template(
-                "index.html",
-            ),
+            render_template("index.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -42,9 +40,7 @@ class Index(Resource):
 class Main(Resource):
     def get(self):
         return make_response(
-            render_template(
-                "index.html",
-            ),
+            render_template("index.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -53,9 +49,7 @@ class Main(Resource):
 class Signup(Resource):
     def get(self):
         return make_response(
-            render_template(
-                "signup.html",
-            ),
+            render_template("signup.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -95,9 +89,7 @@ class Signup(Resource):
 class Login(Resource):
     def get(self):
         return make_response(
-            render_template(
-                "login.html",
-            ),
+            render_template("login.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -131,9 +123,7 @@ class Logout(Resource):
     def get(self):
         logout_user()
         return make_response(
-            render_template(
-                "logout.html",
-            ),
+            render_template("logout.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -143,7 +133,7 @@ class Profile(Resource):
     @login_required
     def get(self):
         return make_response(
-            render_template("profile.html", name=current_user.username),
+            render_template("profile.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -152,9 +142,7 @@ class Profile(Resource):
 class NotLogged(Resource):
     def get(self):
         return make_response(
-            render_template(
-                "not_logged.html",
-            ),
+            render_template("not_logged.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )
@@ -164,5 +152,7 @@ class DashApp(Resource):
     @login_required
     def get(self):
         return make_response(
-            render_template("dash_app.html"), 200, {"Content-Type": "text/html"}
+            render_template("dash_app.html", user=current_user),
+            200,
+            {"Content-Type": "text/html"},
         )
