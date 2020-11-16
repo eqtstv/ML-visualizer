@@ -29,6 +29,7 @@ def update_graph(
         title_text=graph_title,
         paper_bgcolor="rgb(16, 24, 32)",
         plot_bgcolor="rgb(16, 24, 32)",
+        margin=dict(l=40, r=25, b=40, t=40),
     )
 
     fig = go.Figure(data=[trace_train, trace_val], layout=layout)

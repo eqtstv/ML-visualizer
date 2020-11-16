@@ -1,19 +1,43 @@
+:root {
+  --main-bg-color: #101820ff;
+  --main-accent-color: rgb(29, 37, 41);
+}
+
 .main-frame {
   width: 1800px;
   height: 850px;
 }
 
 .hero.is-primary {
-  background-color: #101820ff;
+  background-color: var(--main-bg-color);
   color: #fff;
 }
 
 .hero.is-primary a.navbar-item:hover {
-  background-color: #333333;
+  background-color: var(--main-accent-color);
   color: #fff;
 }
 
 .hero-head {
-  background-color: #101820ff;
+  background-color: var(--main-bg-color);
   box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25);
+}
+
+.box {
+  background-color: var(--main-bg-color);
+  border-radius: 6px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  color: #4a4a4a;
+  display: block;
+  padding: 1.25rem;
+}
+
+.button.is-info {
+  background-color: var(--main-accent-color);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.button.is-info:hover {
+  background-color: var(--main-bg-color);
+  color: #fff;
 }
