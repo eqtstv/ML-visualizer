@@ -3,18 +3,27 @@ import json
 import os
 import pathlib
 import shutil
+import sys
+from getpass import getpass, getuser
 from timeit import default_timer as timer
 
 import requests
 import tensorflow as tf
 from tensorflow import keras
 
-
 # leave it for tests
 # Change it when connecting models
 from ml_visualizer.app import config
 
 URL = f"http://{config['ip']}:{config['port']}"
+
+
+def authenticate_user(email, password):
+    user_data = {
+        "email": email,
+        "password": password,
+    }
+    return requests.post(f"{URL}/auth", json=user_data)
 
 
 def write_data_train(
@@ -29,7 +38,11 @@ def write_data_train(
         "train_accuracy": train_accuracy,
         "train_loss": train_loss,
     }
-    requests.put(f"{URL}/train", json=train_data)
+    requests.put(
+        f"{URL}/train",
+        json=train_data,
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
 
     return train_data
 
@@ -49,7 +62,11 @@ def write_data_val(
         "epoch_time": epoch_time,
     }
 
-    requests.put(f"{URL}/val", json=val_data)
+    requests.put(
+        f"{URL}/val",
+        json=val_data,
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
 
     return val_data
 
@@ -65,7 +82,11 @@ def write_model_params(model, param_tracker):
             }
         )
 
-    requests.put(f"{URL}/params", json=params)
+    requests.put(
+        f"{URL}/params",
+        json=params,
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
 
     return params
 
@@ -78,14 +99,24 @@ def write_model_summary(model):
             for layer in model.layers
         ]
     }
-    requests.put(f"{URL}/summary", json=json.loads(model_summary))
-    requests.put(f"{URL}/layers", json=layer_params)
+    requests.put(
+        f"{URL}/summary",
+        json=json.loads(model_summary),
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
+    requests.put(
+        f"{URL}/layers",
+        json=layer_params,
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
 
     return model.to_json(), layer_params
 
 
 def clear_training_data():
-    return requests.delete(f"{URL}/clear")
+    return requests.delete(
+        f"{URL}/clear", headers={"Authorization": f"Bearer {AuthToken.access_token}"}
+    )
 
 
 class Singleton(type):
@@ -95,6 +126,11 @@ class Singleton(type):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
         return cls._instances[cls]
+
+
+class AuthToken(metaclass=Singleton):
+    def __init__(self, token):
+        self.access_token = token
 
 
 class ParametersTracker(metaclass=Singleton):
@@ -132,6 +168,18 @@ class MLVisualizer(keras.callbacks.Callback):
     """
 
     def __init__(self, tracking_precision=0.05):
+        email = input("Email: ")
+        password = getpass()
+
+        response = authenticate_user(email, password)
+        if "access_token" in response.json():
+            AuthToken.access_token = response.json()["access_token"]
+        else:
+            print(response.json())
+            sys.exit()
+
+        project_name = input("Project name: ")
+
         self.param_tracker = ParametersTracker(tracking_precision)
         self.step = 0
 

@@ -2,12 +2,17 @@ import unittest
 
 import tensorflow as tf
 from callback import (
+    AuthToken,
+    authenticate_user,
     ParametersTracker,
     write_data_train,
     write_data_val,
     write_model_params,
     write_model_summary,
 )
+
+
+AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()["access_token"]
 
 
 def get_model():

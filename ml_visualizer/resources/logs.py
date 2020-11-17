@@ -1,12 +1,14 @@
 import sys
 
 from flask import jsonify, request
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from ml_visualizer.database.database import Base, db_session
 from ml_visualizer.database.models import LogTraining, LogValidation
 
 
 class TrainingLog(Resource):
+    @jwt_required
     def put(self):
         try:
             data = request.json
@@ -25,6 +27,7 @@ class TrainingLog(Resource):
 
 
 class ValidationLog(Resource):
+    @jwt_required
     def put(self):
         try:
             data = request.json

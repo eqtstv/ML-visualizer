@@ -4,11 +4,14 @@ import pathlib
 import dash
 import dash_bootstrap_components as dbc
 from flask import Flask
+from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
+from ml_visualizer.auth.api_auth import Auth
 from ml_visualizer.auth.database.database import init_users_db, users_db
 from ml_visualizer.auth.database.models import User
 from ml_visualizer.auth.resources import (
+    DashApp,
     Index,
     Login,
     Logout,
@@ -17,7 +20,6 @@ from ml_visualizer.auth.resources import (
     Profile,
     Signup,
     login_manager,
-    DashApp,
 )
 from ml_visualizer.database.database import init_db
 from ml_visualizer.resources.data import ClearData
@@ -37,6 +39,7 @@ init_users_db()
 
 
 login_manager.init_app(server)
+jwt = JWTManager(server)
 
 
 api.add_resource(Index, "/")
@@ -47,6 +50,8 @@ api.add_resource(Logout, "/logout")
 api.add_resource(Profile, "/profile")
 api.add_resource(NotLogged, "/notlogged")
 api.add_resource(DashApp, "/dashapp")
+
+api.add_resource(Auth, "/auth")
 
 api.add_resource(ClearData, "/clear")
 api.add_resource(ModelParams, "/params")

@@ -1,6 +1,7 @@
 import sys
 
 from flask import jsonify, request
+from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 
 
@@ -10,6 +11,7 @@ class ModelParams(Resource):
     def get(self):
         return self.data
 
+    @jwt_required
     def put(self):
         try:
             self.data.update(request.json)
@@ -26,6 +28,7 @@ class ModelSummary(Resource):
     def get(self):
         return self.data
 
+    @jwt_required
     def put(self):
         try:
             self.data.update(request.json)
@@ -42,6 +45,7 @@ class ModelLayers(Resource):
     def get(self):
         return self.data
 
+    @jwt_required
     def put(self):
         try:
             self.data.update(request.json)
