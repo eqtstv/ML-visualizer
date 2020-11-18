@@ -1,8 +1,6 @@
 import json
 import pathlib
 
-import dash
-import dash_bootstrap_components as dbc
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
@@ -10,17 +8,18 @@ from flask_restful import Api
 from ml_visualizer.api.database import init_db
 from ml_visualizer.api.resources import (
     ClearData,
-    TrainingLog,
-    ValidationLog,
     ModelLayers,
     ModelParams,
     ModelSummary,
+    TrainingLog,
+    ValidationLog,
 )
 from ml_visualizer.auth.api_auth import Auth
 from ml_visualizer.user.database import init_users_db
 from ml_visualizer.user.models import User
 from ml_visualizer.user.resources import Login, Logout, Signup, login_manager
 from ml_visualizer.web.resources import DashApp, Index, Main, NotLogged, Profile
+
 
 CONFIG_PATH = pathlib.Path(__file__).parent.joinpath("config.json").resolve()
 with open(CONFIG_PATH) as f:
@@ -55,11 +54,3 @@ api.add_resource(ModelSummary, "/summary")
 api.add_resource(ModelLayers, "/layers")
 api.add_resource(TrainingLog, "/train")
 api.add_resource(ValidationLog, "/val")
-
-
-app = dash.Dash(
-    __name__,
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
-    server=server,
-    url_base_pathname="/dash_app/",
-)

@@ -4,7 +4,7 @@ import unittest
 import dash_html_components as html
 import pandas as pd
 import plotly
-from ml_visualizer.callbacks_utils import (
+from ml_visualizer.dash_app.callbacks_utils import (
     get_input_layer_info,
     get_layers,
     get_model_summary_divs,

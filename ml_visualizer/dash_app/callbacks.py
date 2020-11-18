@@ -2,9 +2,10 @@ import dash_html_components as html
 import pandas as pd
 import requests
 from dash.dependencies import Input, Output
-
-from ml_visualizer.app import app, config
-from ml_visualizer.callbacks_utils import (
+from ml_visualizer.api.database import engine
+from ml_visualizer.app import config
+from ml_visualizer.dash_app.dash_app import dash_app
+from ml_visualizer.dash_app.callbacks_utils import (
     get_model_summary_divs,
     update_current_value,
     update_graph,
@@ -12,12 +13,11 @@ from ml_visualizer.callbacks_utils import (
     update_progress_bars,
     update_progress_display,
 )
-from ml_visualizer.api.database import engine
 
 URL = f"http://{config['ip']}:{config['port']}"
 
 
-@app.callback(
+@dash_app.callback(
     Output("interval-log-update", "interval"),
     [Input("dropdown-interval-control", "value")],
 )
@@ -25,7 +25,7 @@ def update_interval_log_update(interval_rate):
     return update_interval_log(interval_rate)
 
 
-@app.callback(
+@dash_app.callback(
     Output("model-params-storage", "data"),
     [Input("interval-log-update", "n_intervals")],
 )
@@ -36,7 +36,7 @@ def get_model_params(_):
         return None
 
 
-@app.callback(
+@dash_app.callback(
     Output("model-summary-storage", "data"),
     [Input("interval-log-update", "n_intervals")],
 )
@@ -47,7 +47,7 @@ def get_model_params(_):
         return None
 
 
-@app.callback(
+@dash_app.callback(
     Output("run-log-storage", "data"), [Input("interval-log-update", "n_intervals")]
 )
 def get_run_log(_):
@@ -80,7 +80,7 @@ def get_run_log(_):
         return None
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-accuracy-graph", "children"),
     [
         Input("run-log-storage", "data"),
@@ -98,7 +98,7 @@ def update_accuracy_graph(run_log_json):
     return [graph]
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-loss-graph", "children"),
     [
         Input("run-log-storage", "data"),
@@ -117,7 +117,7 @@ def update_loss_graph(run_log_json):
     return [graph]
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-current-accuracy-value", "children"), [Input("run-log-storage", "data")]
 )
 def update_div_current_accuracy_value(run_log_json):
@@ -126,7 +126,7 @@ def update_div_current_accuracy_value(run_log_json):
     )
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-current-loss-value", "children"),
     [Input("run-log-storage", "data")],
 )
@@ -134,7 +134,7 @@ def update_div_current_loss_value(run_log_json):
     return update_current_value("train_loss", "val_loss", "Loss", run_log_json)
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-model-summary", "children"),
     [Input("model-params-storage", "data"), Input("model-summary-storage", "data")],
 )
@@ -142,7 +142,7 @@ def update_model_summary_divs(model_params, model_summary):
     return get_model_summary_divs(model_params, model_summary)
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-model-params", "children"), [Input("model-params-storage", "data")]
 )
 def get_model_params_div(model_params):
@@ -150,7 +150,7 @@ def get_model_params_div(model_params):
     # return html.Div(html.P(str(model_params)))
 
 
-@app.callback(
+@dash_app.callback(
     Output("div-epoch-step-display", "children"),
     [Input("run-log-storage", "data"), Input("model-params-storage", "data")],
 )
@@ -158,7 +158,7 @@ def update_div_step_display(run_log_json, model_params):
     return update_progress_display(run_log_json, model_params)
 
 
-@app.callback(
+@dash_app.callback(
     [
         Output("epoch-progress", "value"),
         Output("epoch-progress", "children"),
