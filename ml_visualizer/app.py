@@ -25,7 +25,7 @@ CONFIG_PATH = pathlib.Path(__file__).parent.joinpath("config.json").resolve()
 with open(CONFIG_PATH) as f:
     config = json.load(f)
 
-server = Flask("my_app")
+server = Flask(__name__)
 server.secret_key = config["secret_key"]
 
 api = Api(server)
