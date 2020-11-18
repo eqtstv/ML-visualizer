@@ -8,6 +8,17 @@
   height: 850px;
 }
 
+.hero-body {
+  padding: 0;
+}
+
+@media screen and (min-width: 1280px) {
+  #main-container {
+    max-width: 1800px;
+    max-height: 850px;
+  }
+}
+
 .hero.is-primary {
   background-color: var(--main-bg-color);
   color: #fff;

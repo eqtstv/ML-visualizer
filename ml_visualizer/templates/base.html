@@ -9,6 +9,10 @@
       rel="shortcut icon"
       href="{{ url_for('static', filename='favicon.ico') }}"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+    />
     <link rel="stylesheet" href="static/style.css" />
     <link rel="stylesheet" href="static/custom.css" />
   </head>
@@ -45,7 +49,7 @@
       </div>
 
       <div class="hero-body">
-        <div class="container has-text-centered">
+        <div id="main-container" class="container has-text-centered">
           {% block content %} {% endblock %}
         </div>
       </div>
