@@ -15,8 +15,8 @@ from flask_login import (
     logout_user,
 )
 from flask_restful import Resource
-from ml_visualizer.auth.database.database import db_session, users_db
-from ml_visualizer.auth.database.models import LoginForm, User, is_safe_url
+from ml_visualizer.user.database import db_session, users_db
+from ml_visualizer.user.models import LoginForm, User, is_safe_url
 from werkzeug.security import check_password_hash, generate_password_hash
 
 login_manager = LoginManager()
@@ -26,24 +26,6 @@ login_manager.login_view = "notlogged"
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
-
-
-class Index(Resource):
-    def get(self):
-        return make_response(
-            render_template("index.html", user=current_user),
-            200,
-            {"Content-Type": "text/html"},
-        )
-
-
-class Main(Resource):
-    def get(self):
-        return make_response(
-            render_template("index.html", user=current_user),
-            200,
-            {"Content-Type": "text/html"},
-        )
 
 
 class Signup(Resource):
@@ -124,35 +106,6 @@ class Logout(Resource):
         logout_user()
         return make_response(
             render_template("logout.html", user=current_user),
-            200,
-            {"Content-Type": "text/html"},
-        )
-
-
-class Profile(Resource):
-    @login_required
-    def get(self):
-        return make_response(
-            render_template("profile.html", user=current_user),
-            200,
-            {"Content-Type": "text/html"},
-        )
-
-
-class NotLogged(Resource):
-    def get(self):
-        return make_response(
-            render_template("not_logged.html", user=current_user),
-            200,
-            {"Content-Type": "text/html"},
-        )
-
-
-class DashApp(Resource):
-    @login_required
-    def get(self):
-        return make_response(
-            render_template("dash_app.html", user=current_user),
             200,
             {"Content-Type": "text/html"},
         )

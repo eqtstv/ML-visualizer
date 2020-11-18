@@ -3,8 +3,8 @@ from urllib.parse import urljoin, urlparse
 from flask import request
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
-from ml_visualizer.auth.database.database import users_db
-from sqlalchemy import Column, Float, Integer, String
+from ml_visualizer.user.database import users_db
+from sqlalchemy import Column, Integer, String
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired

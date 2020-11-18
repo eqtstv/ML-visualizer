@@ -12,7 +12,7 @@ from ml_visualizer.callbacks_utils import (
     update_progress_bars,
     update_progress_display,
 )
-from ml_visualizer.database.database import engine
+from ml_visualizer.api.database import engine
 
 URL = f"http://{config['ip']}:{config['port']}"
 

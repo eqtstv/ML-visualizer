@@ -1,4 +1,4 @@
-from ml_visualizer.database.database import Base
+from ml_visualizer.api.database import Base
 from sqlalchemy import Column, Float, Integer
 
 

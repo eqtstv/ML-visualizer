@@ -1,7 +1,8 @@
 from flask import jsonify, make_response, request
 from flask_jwt_extended import create_access_token
 from flask_restful import Resource
-from ml_visualizer.auth.database.models import User, check_password_hash
+from ml_visualizer.user.models import User
+from werkzeug.security import check_password_hash
 
 
 class Auth(Resource):
