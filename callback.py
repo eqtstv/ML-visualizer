@@ -174,8 +174,9 @@ class MLVisualizer(keras.callbacks.Callback):
         response = authenticate_user(email, password)
         if "access_token" in response.json():
             AuthToken.access_token = response.json()["access_token"]
+            print("\nAuthentication successful! \n")
         else:
-            print(response.json())
+            print(f"\n{response.json()['msg']}!\n")
             sys.exit()
 
         project_name = input("Project name: ")
