@@ -1,3 +1,26 @@
 {% extends "base.html" %} {% block content %}
-<h1 class="title">Welcome, {{ current_user.username }}!</h1>
+<div class="container">
+  <h1 class="title">Welcome, {{ current_user.username }}!</h1>
+  <h2 class="subtitle">Here are your projects</h2>
+  <div class="projects-container has-text-left">
+    <div class="project-card">
+      <p class="project-title">Project one</p>
+      <p class="project-description has-text-left">
+        Project one description a little bit longer, a little bit longera little
+        bit longera little bit longera little bit longer a little bit longera
+        little bit longera little bit longera little bit longer
+      </p>
+    </div>
+    <div class="project-card">
+      <p class="project-title">Project two</p>
+      <p class="project-description has-text-left">
+        Project one description a little bit longer
+      </p>
+    </div>
+
+    <div class="project-card"><p class="project-title">Project three</p></div>
+    <div class="project-card"><p class="project-title">Project four</p></div>
+    <div class="project-card"><p class="project-title">Project five</p></div>
+  </div>
+</div>
 {% endblock %}
