@@ -26,6 +26,34 @@ def authenticate_user(email, password):
     return requests.post(f"{URL}/auth", json=user_data)
 
 
+def check_valid_project(
+    project_name, project_description="Project added from training"
+):
+    project = {
+        "project_name": str(project_name),
+        "project_description": str(project_description),
+    }
+
+    return requests.post(
+        f"{URL}/project",
+        json=project,
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
+
+
+def create_new_project(project_name, project_description):
+    project = {
+        "project_name": str(project_name),
+        "project_description": str(project_description),
+    }
+
+    return requests.put(
+        f"{URL}/project",
+        json=project,
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+    )
+
+
 def write_data_train(
     step,
     batch,
@@ -171,15 +199,35 @@ class MLVisualizer(keras.callbacks.Callback):
         email = input("Email: ")
         password = getpass()
 
-        response = authenticate_user(email, password)
-        if "access_token" in response.json():
-            AuthToken.access_token = response.json()["access_token"]
-            print("\nAuthentication successful! \n")
+        auth_response = authenticate_user(email, password)
+
+        if "access_token" in auth_response.json():
+            AuthToken.access_token = auth_response.json()["access_token"]
+            print("\nAuthentication successful.\n")
         else:
-            print(f"\n{response.json()['msg']}!\n")
+            print(f"\n{auth_response.json()['msg']}\n")
             sys.exit()
 
-        project_name = input("Project name: ")
+        check_project_name = str(input("Project name: "))
+        project_response = check_valid_project(check_project_name)
+
+        if project_response.status_code == 200:
+            print("\nProject selected\n")
+            self.project_name = check_project_name
+        else:
+            print(f"\n{project_response.json()['msg']}\n")
+            decide = input()
+
+            if decide == "yes":
+                name = input("Project name: ")
+                description = input("Project description: ")
+                project_response = create_new_project(name, description)
+
+            if project_response.status_code == 200:
+                print("\nProject successfully created.\n")
+            else:
+                print(f"\n{project_response.json()['msg']}\n")
+                sys.exit()
 
         self.param_tracker = ParametersTracker(tracking_precision)
         self.step = 0

@@ -1,5 +1,5 @@
 from ml_visualizer.api.database import Base
-from sqlalchemy import Column, Float, Integer
+from sqlalchemy import Column, Float, Integer, String
 
 
 class LogTraining(Base):
@@ -40,3 +40,17 @@ class LogValidation(Base):
 
     def __repr__(self):
         return "<Epoch %r>" % (self.epoch)
+
+
+class Projects(Base):
+    __tablename__ = "projects"
+    id = Column(Integer, primary_key=True)
+    project_name = Column(String(64), unique=True)
+    project_description = Column(String(64))
+
+    def __init__(self, project_name=None, project_description=None):
+        self.project_name = project_name
+        self.project_description = project_description
+
+    def __repr__(self):
+        return "<Project name>" % (self.project_name)

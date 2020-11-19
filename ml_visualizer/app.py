@@ -13,6 +13,7 @@ from ml_visualizer.api.resources import (
     ModelSummary,
     TrainingLog,
     ValidationLog,
+    Project,
 )
 from ml_visualizer.auth.api_auth import Auth
 from ml_visualizer.user.database import init_users_db
@@ -54,3 +55,4 @@ api.add_resource(ModelSummary, "/summary")
 api.add_resource(ModelLayers, "/layers")
 api.add_resource(TrainingLog, "/train")
 api.add_resource(ValidationLog, "/val")
+api.add_resource(Project, "/project")

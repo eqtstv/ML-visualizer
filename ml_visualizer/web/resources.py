@@ -1,6 +1,23 @@
 from flask import make_response, render_template
 from flask_restful import Resource
 from flask_login import current_user, login_required
+from ml_visualizer.api.models import Projects
+
+
+def get_all_projects():
+    projects = Projects.query.all()
+    projects_dict = {}
+    i = 0
+    for project in projects:
+        app = {
+            f"project{i}": {
+                "name": project.project_name,
+                "description": project.project_description,
+            }
+        }
+        projects_dict = {**projects_dict, **app}
+        i += 1
+    return projects_dict
 
 
 class Index(Resource):
@@ -25,7 +42,9 @@ class Profile(Resource):
     @login_required
     def get(self):
         return make_response(
-            render_template("profile.html", user=current_user),
+            render_template(
+                "profile.html", user=current_user, projects=get_all_projects()
+            ),
             200,
             {"Content-Type": "text/html"},
         )
