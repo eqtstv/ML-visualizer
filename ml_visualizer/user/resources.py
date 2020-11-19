@@ -67,6 +67,38 @@ class Signup(Resource):
             redirect(url_for("login")), 200, {"Content-Type": "text/html"}
         )
 
+    def put(self):
+        data = request.json
+        email = data["email"]
+        username = data["name"]
+        password = data["password"]
+
+        user = User.query.filter_by(
+            email=email
+        ).first()  # if this returns a user, then the email already exists in database
+
+        if (
+            user
+        ):  # if a user is found, we want to redirect back to signup page so user can try again
+            return make_response(
+                redirect(url_for("signup")), 200, {"Content-Type": "text/html"}
+            )
+
+        # create a new user with the form data. Hash the password so the plaintext version isn't saved.
+        new_user = User(
+            email=email,
+            username=username,
+            password_hash=generate_password_hash(password, method="sha256"),
+        )
+
+        # add the new user to the database
+        db_session.add(new_user)
+        db_session.commit()
+
+        return make_response(
+            redirect(url_for("login")), 200, {"Content-Type": "text/html"}
+        )
+
 
 class Login(Resource):
     def get(self):

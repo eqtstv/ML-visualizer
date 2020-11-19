@@ -1,4 +1,5 @@
 import unittest
+import requests
 
 import tensorflow as tf
 from callback import (
@@ -10,9 +11,7 @@ from callback import (
     write_model_params,
     write_model_summary,
 )
-
-
-AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()["access_token"]
+from ml_visualizer.app import config
 
 
 def get_model():
@@ -29,6 +28,18 @@ def get_model():
         metrics=["accuracy"],
     )
     return model
+
+
+class TestAuth(unittest.TestCase):
+    def test_user_authorization_json(self):
+        user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
+        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
+
+        self.assertEqual(r.status_code, 200)
+
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
+            "access_token"
+        ]
 
 
 class TestCallback(unittest.TestCase):

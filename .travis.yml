@@ -5,12 +5,7 @@ python:
 install:
   - pip install -r requirements.txt
 # command to run tests
-addons:
-  hosts:
-    - travis.dev
-    - joshkalderimis.com
 script:
   - chmod u+r+x run_tests.bat
-  - curl --header "Content-Type: application/json" --request POST --data '{'email':'asd@asd.pl', 'username':'asd', 'password':'asd'}' http://127.0.0.1:5050/signup
   - python run.py &
   - ./run_tests.bat
