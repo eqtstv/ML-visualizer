@@ -8,4 +8,4 @@ install:
 script:
   - chmod u+r+x run_tests.bat
   - python run.py &
-  - ./run_tests.bat
+  - ./run_tests_travis.bat
