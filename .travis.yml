@@ -11,6 +11,6 @@ addons:
     - joshkalderimis.com
 script:
   - chmod u+r+x run_tests.bat
-  - curl -d '{'email':'asd@asd.pl', 'username':'asd', 'password':'asd'}' -H "Content-Type: application/json" -X POST http://127.0.0.1:5050/signup
+  - curl --header "Content-Type: application/json" --request POST --data '{'email':'asd@asd.pl', 'username':'asd', 'password':'asd'}' http://127.0.0.1:5050/signup
   - python run.py &
   - ./run_tests.bat
