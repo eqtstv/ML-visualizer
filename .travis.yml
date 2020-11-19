@@ -9,4 +9,5 @@ install:
 # command to run tests
 script:
   - chmod u+r+x run_tests.bat
+  - python run.py
   - ./run_tests.bat
