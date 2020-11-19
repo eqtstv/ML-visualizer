@@ -7,6 +7,10 @@ python:
 install:
   - pip install -r requirements.txt
 # command to run tests
+addons:
+  hosts:
+    - travis.dev
+    - joshkalderimis.com
 script:
   - chmod u+r+x run_tests.bat
   - python run.py
