@@ -13,5 +13,5 @@ addons:
     - joshkalderimis.com
 script:
   - chmod u+r+x run_tests.bat
-  - python run.py
+  - terminal -e python run.py
   - ./run_tests.bat
