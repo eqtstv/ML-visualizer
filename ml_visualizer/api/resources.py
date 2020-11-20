@@ -1,10 +1,10 @@
 import sys
 
 from flask import jsonify, request, make_response
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_raw_jwt
 from flask_restful import Resource
 from ml_visualizer.database.database import Base, db_session
-from ml_visualizer.database.models import LogTraining, LogValidation, Projects
+from ml_visualizer.database.models import LogTraining, LogValidation, Projects, User
 
 
 class ModelParams(Resource):
@@ -134,9 +134,12 @@ class Project(Resource):
                     401,
                 )
             else:
+                user = User.query.filter_by(email=get_jwt_identity()).first()
                 data = request.json
                 new_project = Projects(
-                    data["project_name"], data["project_description"]
+                    user.id,
+                    data["project_name"],
+                    data["project_description"],
                 )
                 db_session.add(new_project)
                 db_session.commit()

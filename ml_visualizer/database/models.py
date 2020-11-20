@@ -4,7 +4,8 @@ from flask import request
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from ml_visualizer.database.database import Base
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired
@@ -25,6 +26,22 @@ class User(UserMixin, Base):
 
     def __repr__(self):
         return "<User{}>".format(self.username)
+
+
+class Projects(Base):
+    __tablename__ = "projects"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    project_name = Column(String(64), unique=True)
+    project_description = Column(String(64))
+
+    def __init__(self, user_id=None, project_name=None, project_description=None):
+        self.user_id = user_id
+        self.project_name = project_name
+        self.project_description = project_description
+
+    def __repr__(self):
+        return "<Project name>" % (self.project_name)
 
 
 class LogTraining(Base):
@@ -65,20 +82,6 @@ class LogValidation(Base):
 
     def __repr__(self):
         return "<Epoch %r>" % (self.epoch)
-
-
-class Projects(Base):
-    __tablename__ = "projects"
-    id = Column(Integer, primary_key=True)
-    project_name = Column(String(64), unique=True)
-    project_description = Column(String(64))
-
-    def __init__(self, project_name=None, project_description=None):
-        self.project_name = project_name
-        self.project_description = project_description
-
-    def __repr__(self):
-        return "<Project name>" % (self.project_name)
 
 
 class LoginForm(FlaskForm):
