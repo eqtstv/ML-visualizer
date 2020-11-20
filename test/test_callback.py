@@ -10,8 +10,19 @@ from callback import (
     write_data_val,
     write_model_params,
     write_model_summary,
+    create_new_project,
+    check_valid_project,
+    clear_training_data,
 )
 from ml_visualizer.app import config
+from ml_visualizer.database.database import Base, db_session
+
+
+def clear_data():
+    meta = Base.metadata
+    for table in reversed(meta.sorted_tables):
+        db_session.execute(table.delete())
+        db_session.commit()
 
 
 def get_model():
@@ -31,15 +42,50 @@ def get_model():
 
 
 class TestAuth(unittest.TestCase):
-    def test_user_authorization_json(self):
+    def test_proper_auth_token_init(self):
+        token = AuthToken("mytoken")
+        self.assertEqual(token.access_token, "mytoken")
+
+    def test_user_authenticate_user(self):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
-
-        self.assertEqual(r.status_code, 200)
 
         AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
             "access_token"
         ]
+
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(AuthToken.access_token), 283)
+        clear_data()
+
+
+class TestProjects(unittest.TestCase):
+    def test_check_valid_project_invalid_name(self):
+        project_name = "no_project"
+        project_description = "no project description"
+
+        r = check_valid_project(project_name, project_description)
+
+        self.assertEqual(
+            r.json(),
+            {
+                "msg": "Invalid project name!\nDo you want to create new project? (yes/no)"
+            },
+        )
+
+    def test_check_create_new_project_valid(self):
+        project_name = "myproject"
+        project_description = "myproject description"
+
+        r = create_new_project(project_name, project_description)
+        self.assertEqual(r.status_code, 200)
+        clear_data()
+
+
+class TestClearData(unittest.TestCase):
+    def test_clear_data(self):
+        r = clear_training_data()
+        self.assertEqual(r.status_code, 200)
 
 
 class TestCallback(unittest.TestCase):
