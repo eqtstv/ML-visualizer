@@ -15,8 +15,8 @@ from flask_login import (
     logout_user,
 )
 from flask_restful import Resource
-from ml_visualizer.user.database import db_session, users_db
-from ml_visualizer.user.models import LoginForm, User, is_safe_url
+from ml_visualizer.database.database import db_session, Base
+from ml_visualizer.database.models import LoginForm, User, is_safe_url
 from werkzeug.security import check_password_hash, generate_password_hash
 
 login_manager = LoginManager()

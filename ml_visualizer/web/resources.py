@@ -1,7 +1,7 @@
 from flask import make_response, render_template
 from flask_restful import Resource
 from flask_login import current_user, login_required
-from ml_visualizer.api.models import Projects
+from ml_visualizer.database.models import Projects
 
 
 def get_all_projects():

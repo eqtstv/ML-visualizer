@@ -1,4 +1,3 @@
-print("starting dash")
 import dash
 import dash_bootstrap_components as dbc
 from ml_visualizer.app import server

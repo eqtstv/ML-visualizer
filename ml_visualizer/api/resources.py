@@ -3,8 +3,8 @@ import sys
 from flask import jsonify, request, make_response
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
-from ml_visualizer.api.database import Base, db_session
-from ml_visualizer.api.models import LogTraining, LogValidation, Projects
+from ml_visualizer.database.database import Base, db_session
+from ml_visualizer.database.models import LogTraining, LogValidation, Projects
 
 
 class ModelParams(Resource):
@@ -149,8 +149,9 @@ class ClearData(Resource):
     @jwt_required
     def delete(self):
         meta = Base.metadata
+        protected_tables = ["projects", "Users"]
         for table in reversed(meta.sorted_tables):
 
-            if str(table.name) != "projects":
+            if str(table.name) not in protected_tables:
                 db_session.execute(table.delete())
         db_session.commit()

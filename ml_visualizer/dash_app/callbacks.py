@@ -2,7 +2,7 @@ import dash_html_components as html
 import pandas as pd
 import requests
 from dash.dependencies import Input, Output
-from ml_visualizer.api.database import engine
+from ml_visualizer.database.database import engine
 from ml_visualizer.app import config
 from ml_visualizer.dash_app.dash_app import dash_app
 from ml_visualizer.dash_app.callbacks_utils import (
