@@ -4,8 +4,8 @@ from flask_login import current_user, login_required
 from ml_visualizer.database.models import Projects
 
 
-def get_all_projects():
-    projects = Projects.query.all()
+def get_all_user_projects():
+    projects = Projects.query.filter_by(user_id=current_user.id)
     projects_dict = {}
     i = 0
     for project in projects:
@@ -43,7 +43,7 @@ class Profile(Resource):
     def get(self):
         return make_response(
             render_template(
-                "profile.html", user=current_user, projects=get_all_projects()
+                "profile.html", user=current_user, projects=get_all_user_projects()
             ),
             200,
             {"Content-Type": "text/html"},
