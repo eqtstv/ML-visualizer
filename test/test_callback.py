@@ -46,6 +46,26 @@ class TestAuth(unittest.TestCase):
         token = AuthToken("mytoken")
         self.assertEqual(token.access_token, "mytoken")
 
+    def test_auth_request_not_json(self):
+        user = "testuser"
+        r = requests.post(f"http://{config['ip']}:{config['port']}/auth", data=user)
+        self.assertEqual(r.json(), {"msg": "Missing JSON in request."})
+
+    def test_auth_missing_email_parameter(self):
+        user = {"email": "", "password": "asd"}
+        r = requests.post(f"http://{config['ip']}:{config['port']}/auth", json=user)
+        self.assertEqual(r.json(), {"msg": "Missing email parameter."})
+
+    def test_auth_missing_password_parameter(self):
+        user = {"email": "asd@asd.pl", "password": ""}
+        r = requests.post(f"http://{config['ip']}:{config['port']}/auth", json=user)
+        self.assertEqual(r.json(), {"msg": "Missing password parameter."})
+
+    def test_auth_wrong_email_or_password_parameter(self):
+        user = {"email": "asd@asd.pl", "password": "asd"}
+        r = requests.post(f"http://{config['ip']}:{config['port']}/auth", json=user)
+        self.assertEqual(r.json(), {"msg": "Bad email or password."})
+
     def test_user_authenticate_user(self):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
