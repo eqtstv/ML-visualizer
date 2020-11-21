@@ -13,6 +13,7 @@ from ml_visualizer.dash_app.callbacks_utils import (
     update_progress_bars,
     update_progress_display,
 )
+from flask_login import current_user
 
 URL = f"http://{config['ip']}:{config['port']}"
 
@@ -31,7 +32,23 @@ def update_interval_log_update(interval_rate):
 )
 def get_model_params(_):
     try:
-        return requests.get(f"{URL}/params").json()
+        with engine.connect() as connection:
+            model_params = pd.read_sql(
+                f"SELECT \
+                tracking_precision, \
+                no_steps, \
+                epochs, \
+                batch_split, \
+                max_batch_step, \
+                steps_in_batch, \
+                no_tracked_steps, \
+                total_params \
+                FROM model_params \
+                WHERE user_id=={current_user.id}",
+                connection,
+            )
+        print(model_params.to_dict())
+        return model_params.to_dict()
     except:
         return None
 
@@ -54,11 +71,11 @@ def get_run_log(_):
     try:
         with engine.connect() as connection:
             df_train = pd.read_sql(
-                "SELECT step, batch, train_accuracy, train_loss FROM log_training",
+                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id}",
                 connection,
             )
             df_val = pd.read_sql(
-                "SELECT step, val_accuracy, val_loss, epoch, epoch_time FROM log_validation",
+                f"SELECT step, val_accuracy, val_loss, epoch, epoch_time FROM log_validation WHERE user_id=={current_user.id}",
                 connection,
             )
 
@@ -71,7 +88,7 @@ def get_run_log(_):
     try:
         with engine.connect() as connection:
             df_train = pd.read_sql(
-                "SELECT step, batch, train_accuracy, train_loss FROM log_training",
+                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id}",
                 connection,
             )
         json = df_train.to_json(orient="split")

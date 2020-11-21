@@ -125,14 +125,14 @@ model_summary = {
 }
 
 model_params = {
-    "tracking_precision": 0.01,
-    "no_steps": 1000,
-    "epochs": 10,
-    "batch_split": 100,
-    "max_batch_step": 900,
-    "steps_in_batch": 10,
-    "no_tracked_steps": 100,
-    "total_params": 101770,
+    "tracking_precision": {"0": 0.01},
+    "no_steps": {"0": 1000},
+    "epochs": {"0": 10},
+    "batch_split": {"0": 100},
+    "max_batch_step": {"0": 900},
+    "steps_in_batch": {"0": 10},
+    "no_tracked_steps": {"0": 100},
+    "total_params": {"0": 101770},
 }
 
 

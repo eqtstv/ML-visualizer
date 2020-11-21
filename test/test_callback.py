@@ -104,8 +104,15 @@ class TestProjects(unittest.TestCase):
 
 class TestClearData(unittest.TestCase):
     def test_clear_data(self):
+        user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
+        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
+
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
+            "access_token"
+        ]
         r = clear_training_data()
         self.assertEqual(r.status_code, 200)
+        clear_data()
 
 
 class TestCallback(unittest.TestCase):
@@ -123,12 +130,19 @@ class TestCallback(unittest.TestCase):
             "train_accuracy": train_accuracy,
             "train_loss": train_loss,
         }
+        user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
+        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
+
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
+            "access_token"
+        ]
 
         # WHEN write_data_train() is ran with that input
         result = write_data_train(step, batch, train_loss, train_accuracy)
 
         # THEN function should return valid dictionary
         self.assertDictEqual(result, valid_dict)
+        clear_data()
 
     def test_write_data_val(self):
         # GIVEN validation data
@@ -146,12 +160,18 @@ class TestCallback(unittest.TestCase):
             "epoch": epoch,
             "epoch_time": epoch_time,
         }
+        user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
+        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
+            "access_token"
+        ]
         # WHEN write_data_val() is ran with that input
         result = write_data_val(step, val_loss, val_accuracy, epoch, epoch_time)
 
         # THEN function should return valid dictionary
         self.assertDictEqual(result, valid_dict)
+        clear_data()
 
     def test_parameters_tracker(self):
         # GIVEN ParameterTracker class with tracking precision 0.01
@@ -163,7 +183,12 @@ class TestCallback(unittest.TestCase):
 
         # THEN write_parameters() should return valid dictiorany
         result = param_tracker.write_parameters()
+        user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
+        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
+            "access_token"
+        ]
         valid_dict = {
             "tracking_precision": 0.01,
             "no_steps": 1000,
@@ -174,6 +199,7 @@ class TestCallback(unittest.TestCase):
         }
 
         self.assertDictEqual(valid_dict, result)
+        clear_data()
 
     def test_write_model_params(self):
         # GIVEN model
@@ -200,6 +226,7 @@ class TestCallback(unittest.TestCase):
         }
 
         self.assertDictEqual(result, valid_dict)
+        clear_data()
 
     def test_write_model_summary(self):
         # GIVEN model
@@ -217,6 +244,7 @@ class TestCallback(unittest.TestCase):
         valid_model_layers = {"layers": [({"name": "flatten_1"})]}
 
         self.assertEqual(result[1].keys(), valid_model_layers.keys())
+        clear_data()
 
 
 if __name__ == "__main__":

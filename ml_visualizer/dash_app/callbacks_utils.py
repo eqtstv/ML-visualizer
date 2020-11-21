@@ -235,10 +235,14 @@ def update_progress_bars(run_log_json, model_params):
         run_log_df = pd.read_json(run_log_json, orient="split")
         if len(run_log_df["batch"]) != 0 and model_params:
             batch_prog = (
-                (run_log_df["batch"].iloc[-1]) * 100 / model_params["max_batch_step"]
+                (run_log_df["batch"].iloc[-1])
+                * 100
+                / model_params["max_batch_step"]["0"]
             )
             step_prog = (
-                run_log_df["step"].iloc[-1] * 100 / model_params["no_tracked_steps"]
+                run_log_df["step"].iloc[-1]
+                * 100
+                / model_params["no_tracked_steps"]["0"]
             )
 
             return (
@@ -258,21 +262,23 @@ def update_progress_display(run_log_json, model_params):
         run_log_df = pd.read_json(run_log_json, orient="split")
 
         if len(run_log_df["batch"]) != 0 and model_params:
-            residue = model_params["no_steps"] - model_params["max_batch_step"]
+            residue = (
+                model_params["no_steps"]["0"] - model_params["max_batch_step"]["0"]
+            )
 
             if residue == 0:
-                residue = model_params["batch_split"]
+                residue = model_params["batch_split"]["0"]
 
             steps_div = (
                 html.P(
-                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_params['no_steps']}"
+                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_params['no_steps']['0']}"
                 ),
             )
 
-            epochs_div = html.P(f"Epoch: {1:.0f} / {model_params['epochs']}")
+            epochs_div = html.P(f"Epoch: {1:.0f} / {model_params['epochs']['0']}")
 
             tracking_precision = html.P(
-                f"Tracking precision: {model_params['tracking_precision']}"
+                f"Tracking precision: {model_params['tracking_precision']['0']}"
             )
 
         if run_log_df["epoch"].last_valid_index() and model_params:
@@ -280,9 +286,9 @@ def update_progress_display(run_log_json, model_params):
             epoch = run_log_df["epoch"].iloc[last_val_index] + 1
 
             et = run_log_df["epoch_time"].iloc[last_val_index]
-            eta = et * model_params["epochs"]
+            eta = et * model_params["epochs"]["0"]
 
-            epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_params['epochs']}")
+            epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_params['epochs']['0']}")
             epoch_time_div = html.P(f"Epoch time: {et:.4f} s.")
             eta_div = html.P(f"Estimated training time: {eta:.4f} s.")
 
@@ -336,7 +342,7 @@ def get_model_summary_divs(model_params, model_summary):
                 html.P("Number of layers:"),
                 html.P(len(layers_info) - 1),
                 html.P("Total params:"),
-                html.P(model_params["total_params"]),
+                html.P(model_params["total_params"]["0"]),
             ],
             className="model-summary",
         )

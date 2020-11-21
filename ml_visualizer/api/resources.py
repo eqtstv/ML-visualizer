@@ -4,7 +4,13 @@ from flask import jsonify, request, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_raw_jwt
 from flask_restful import Resource
 from ml_visualizer.database.database import Base, db_session
-from ml_visualizer.database.models import LogTraining, LogValidation, Projects, User
+from ml_visualizer.database.models import (
+    LogTraining,
+    LogValidation,
+    Projects,
+    User,
+    ModelParameters,
+)
 
 
 class ModelParams(Resource):
@@ -17,10 +23,24 @@ class ModelParams(Resource):
     def put(self):
         try:
             self.data.update(request.json)
+            user = User.query.filter_by(email=get_jwt_identity()).first()
+            model_params = ModelParameters(
+                user.id,
+                self.data["tracking_precision"],
+                self.data["no_steps"],
+                self.data["epochs"],
+                self.data["batch_split"],
+                self.data["max_batch_step"],
+                self.data["steps_in_batch"],
+                self.data["no_tracked_steps"],
+                self.data["total_params"],
+            )
+            db_session.add(model_params)
+            db_session.commit()
+
         except:
             e = sys.exc_info()
             print(e)
-
         return jsonify(self.data)
 
 
@@ -63,7 +83,9 @@ class TrainingLog(Resource):
     def put(self):
         try:
             data = request.json
+            user = User.query.filter_by(email=get_jwt_identity()).first()
             train_log = LogTraining(
+                user.id,
                 data["step"],
                 data["batch"],
                 data["train_loss"],
@@ -82,7 +104,9 @@ class ValidationLog(Resource):
     def put(self):
         try:
             data = request.json
+            user = User.query.filter_by(email=get_jwt_identity()).first()
             val_log = LogValidation(
+                user.id,
                 data["step"],
                 data["val_loss"],
                 data["val_accuracy"],
@@ -151,10 +175,11 @@ class Project(Resource):
 class ClearData(Resource):
     @jwt_required
     def delete(self):
+        user = User.query.filter_by(email=get_jwt_identity()).first()
         meta = Base.metadata
         protected_tables = ["projects", "Users"]
         for table in reversed(meta.sorted_tables):
 
-            if str(table.name) not in protected_tables:
-                db_session.execute(table.delete())
+            if str(table.name) not in protected_tables and user != None:
+                db_session.execute(table.delete().where(table.c.user_id == user.id))
         db_session.commit()

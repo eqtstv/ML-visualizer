@@ -29,8 +29,15 @@ class TestLogTraining(unittest.TestCase):
         columns = [(column.name, column.type) for column in inspect(LogTraining).c]
 
         # AND valid column names and types
-        valid_column_names = ["id", "step", "batch", "train_accuracy", "train_loss"]
-        valid_column_types = [Integer, Integer, Integer, Float, Float]
+        valid_column_names = [
+            "id",
+            "user_id",
+            "step",
+            "batch",
+            "train_accuracy",
+            "train_loss",
+        ]
+        valid_column_types = [Integer, Integer, Integer, Integer, Float, Float]
 
         # THEN colums should have valid names and types
         for i, k in enumerate(columns):
@@ -38,12 +45,14 @@ class TestLogTraining(unittest.TestCase):
             self.assertIsInstance(columns[i][1], valid_column_types[i])
 
     def test_log_training_init(self):
+        user_id = 1
         step = 1
         batch = 10
         train_acc = 0.7
         train_loss = 0.5
 
-        init_row = LogTraining(step, batch, train_acc, train_loss)
+        init_row = LogTraining(user_id, step, batch, train_acc, train_loss)
+        self.assertEqual(init_row.user_id, user_id)
         self.assertEqual(init_row.step, step)
         self.assertEqual(init_row.batch, batch)
         self.assertEqual(init_row.train_accuracy, train_acc)
@@ -61,13 +70,14 @@ class TestLogValidation(unittest.TestCase):
         # AND valid column names and types
         valid_column_names = [
             "id",
+            "user_id",
             "step",
             "val_accuracy",
             "val_loss",
             "epoch",
             "epoch_time",
         ]
-        valid_column_types = [Integer, Integer, Float, Float, Integer, Float]
+        valid_column_types = [Integer, Integer, Integer, Float, Float, Integer, Float]
 
         # THEN colums should have valid names and types
         for i, k in enumerate(columns):
@@ -75,13 +85,15 @@ class TestLogValidation(unittest.TestCase):
             self.assertIsInstance(columns[i][1], valid_column_types[i])
 
     def test_log_validation_init(self):
+        user_id = 1
         step = 10
         val_acc = 0.6
         val_loss = 0.7
         epoch = 3
         epoch_time = 4.2
 
-        init_row = LogValidation(step, val_acc, val_loss, epoch, epoch_time)
+        init_row = LogValidation(user_id, step, val_acc, val_loss, epoch, epoch_time)
+        self.assertEqual(init_row.user_id, user_id)
         self.assertEqual(init_row.step, step)
         self.assertEqual(init_row.val_accuracy, val_acc)
         self.assertEqual(init_row.val_loss, val_loss)

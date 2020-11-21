@@ -47,12 +47,16 @@ class Projects(Base):
 class LogTraining(Base):
     __tablename__ = "log_training"
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
     step = Column(Integer)
     batch = Column(Integer)
     train_accuracy = Column(Float(50))
     train_loss = Column(Float(50))
 
-    def __init__(self, step=None, batch=None, train_accuracy=None, train_loss=None):
+    def __init__(
+        self, user_id=None, step=None, batch=None, train_accuracy=None, train_loss=None
+    ):
+        self.user_id = user_id
         self.step = step
         self.batch = batch
         self.train_accuracy = train_accuracy
@@ -65,6 +69,7 @@ class LogTraining(Base):
 class LogValidation(Base):
     __tablename__ = "log_validation"
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
     step = Column(Integer)
     val_accuracy = Column(Float(50))
     val_loss = Column(Float(50))
@@ -72,8 +77,15 @@ class LogValidation(Base):
     epoch_time = Column(Float(50))
 
     def __init__(
-        self, step=None, val_accuracy=None, val_loss=None, epoch=None, epoch_time=None
+        self,
+        user_id=None,
+        step=None,
+        val_accuracy=None,
+        val_loss=None,
+        epoch=None,
+        epoch_time=None,
     ):
+        self.user_id = user_id
         self.step = step
         self.val_accuracy = val_accuracy
         self.val_loss = val_loss
@@ -82,6 +94,42 @@ class LogValidation(Base):
 
     def __repr__(self):
         return "<Epoch %r>" % (self.epoch)
+
+
+class ModelParameters(Base):
+    __tablename__ = "model_params"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    tracking_precision = Column(Float(50))
+    no_steps = Column(Integer)
+    epochs = Column(Integer)
+    batch_split = Column(Integer)
+    max_batch_step = Column(Integer)
+    steps_in_batch = Column(Integer)
+    no_tracked_steps = Column(Integer)
+    total_params = Column(Integer)
+
+    def __init__(
+        self,
+        user_id=None,
+        tracking_precision=None,
+        no_steps=None,
+        epochs=None,
+        batch_split=None,
+        max_batch_step=None,
+        steps_in_batch=None,
+        no_tracked_steps=None,
+        total_params=None,
+    ):
+        self.user_id = user_id
+        self.tracking_precision = tracking_precision
+        self.no_steps = no_steps
+        self.epochs = epochs
+        self.batch_split = batch_split
+        self.max_batch_step = max_batch_step
+        self.steps_in_batch = steps_in_batch
+        self.no_tracked_steps = no_tracked_steps
+        self.total_params = total_params
 
 
 class LoginForm(FlaskForm):
