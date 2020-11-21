@@ -47,7 +47,6 @@ def get_model_params(_):
                 WHERE user_id=={current_user.id}",
                 connection,
             )
-        print(model_params.to_dict())
         return model_params.to_dict()
     except:
         return None
