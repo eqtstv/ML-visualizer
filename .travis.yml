@@ -3,9 +3,7 @@ python:
   - "3.6"
 install:
   - pip install -r requirements.txt
-  - sudo apt-get install sloccount
 script:
-  - sloccount ml_visualizer test callback.py ml_visualizer/api ml_visualizer/dash_app ml_visualizer/user ml_visualizer/web
   - chmod u+r+x run_tests_travis.bat
   - python run.py &
   - ./run_tests_travis.bat
