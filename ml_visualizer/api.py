@@ -3,8 +3,8 @@ import sys
 from flask import jsonify, request, make_response
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_raw_jwt
 from flask_restful import Resource
-from ml_visualizer.database.database import Base, db_session
-from ml_visualizer.database.models import (
+from ml_visualizer.database import Base, db_session
+from ml_visualizer.models import (
     LogTraining,
     LogValidation,
     Projects,

@@ -3,7 +3,7 @@ from urllib.parse import urljoin, urlparse
 from flask import request
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
-from ml_visualizer.database.database import Base
+from ml_visualizer.database import Base
 from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash

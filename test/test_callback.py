@@ -15,7 +15,7 @@ from callback import (
     clear_training_data,
 )
 from ml_visualizer.app import config
-from ml_visualizer.database.database import Base, db_session
+from ml_visualizer.database import Base, db_session
 
 
 def clear_data():

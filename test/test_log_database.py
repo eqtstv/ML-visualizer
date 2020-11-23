@@ -2,8 +2,8 @@ import unittest
 
 import sqlalchemy
 from sqlalchemy import inspect, Column, Float, Integer
-from ml_visualizer.database.database import Base, db_session, engine, init_db
-from ml_visualizer.database.models import LogTraining, LogValidation, User, Projects
+from ml_visualizer.database import Base, db_session, engine, init_db
+from ml_visualizer.models import LogTraining, LogValidation, User, Projects
 
 
 class TestDatabase(unittest.TestCase):
