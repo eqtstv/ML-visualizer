@@ -110,7 +110,7 @@ class TestClearData(unittest.TestCase):
         AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
             "access_token"
         ]
-        r = clear_training_data()
+        r = clear_training_data("my_project")
         self.assertEqual(r.status_code, 200)
         clear_data()
 
@@ -118,6 +118,7 @@ class TestClearData(unittest.TestCase):
 class TestCallback(unittest.TestCase):
     def test_write_data_train(self):
         # GIVEN training data
+        project = "my_project"
         step = 1
         batch = 20
         train_loss = 0.85
@@ -125,6 +126,7 @@ class TestCallback(unittest.TestCase):
 
         # AND valid dictiorany output
         valid_dict = {
+            "project_name": project,
             "step": step,
             "batch": batch,
             "train_accuracy": train_accuracy,
@@ -138,7 +140,7 @@ class TestCallback(unittest.TestCase):
         ]
 
         # WHEN write_data_train() is ran with that input
-        result = write_data_train(step, batch, train_loss, train_accuracy)
+        result = write_data_train(project, step, batch, train_loss, train_accuracy)
 
         # THEN function should return valid dictionary
         self.assertDictEqual(result, valid_dict)
@@ -146,6 +148,7 @@ class TestCallback(unittest.TestCase):
 
     def test_write_data_val(self):
         # GIVEN validation data
+        project = "my_project"
         step = 10
         val_loss = 0.85
         val_accuracy = 0.75
@@ -154,6 +157,7 @@ class TestCallback(unittest.TestCase):
 
         # AND valid dictiorany output
         valid_dict = {
+            "project_name": project,
             "step": step,
             "val_accuracy": val_accuracy,
             "val_loss": val_loss,
@@ -167,7 +171,9 @@ class TestCallback(unittest.TestCase):
             "access_token"
         ]
         # WHEN write_data_val() is ran with that input
-        result = write_data_val(step, val_loss, val_accuracy, epoch, epoch_time)
+        result = write_data_val(
+            project, step, val_loss, val_accuracy, epoch, epoch_time
+        )
 
         # THEN function should return valid dictionary
         self.assertDictEqual(result, valid_dict)
@@ -204,6 +210,7 @@ class TestCallback(unittest.TestCase):
     def test_write_model_params(self):
         # GIVEN model
         model = get_model()
+        project = "my_project"
 
         # AND ParametersTracker class with precision = 0.01 and known inputs
         param_tracker = ParametersTracker(0.01)
@@ -211,10 +218,11 @@ class TestCallback(unittest.TestCase):
         param_tracker.get_model_parameters(inputs)
 
         # WHEN write_model_params() is ran with that input
-        result = write_model_params(model, param_tracker)
+        result = write_model_params(model, param_tracker, project)
 
         # THEN it should return valid dictionary
         valid_dict = {
+            "project_name": project,
             "tracking_precision": 0.01,
             "no_steps": 1000,
             "epochs": 10,

@@ -1,15 +1,17 @@
 import sys
 
-from flask import jsonify, request, make_response
-from flask_jwt_extended import jwt_required, get_jwt_identity, get_raw_jwt
+from flask import jsonify, make_response, request
+from flask_jwt_extended import get_jwt_identity, get_raw_jwt, jwt_required
 from flask_restful import Resource
+from sqlalchemy import and_
+
 from ml_visualizer.database import Base, db_session
 from ml_visualizer.models import (
     LogTraining,
     LogValidation,
+    ModelParameters,
     Projects,
     User,
-    ModelParameters,
 )
 
 
@@ -26,6 +28,7 @@ class ModelParams(Resource):
             user = User.query.filter_by(email=get_jwt_identity()).first()
             model_params = ModelParameters(
                 user.id,
+                self.data["project_name"],
                 self.data["tracking_precision"],
                 self.data["no_steps"],
                 self.data["epochs"],
@@ -86,6 +89,7 @@ class TrainingLog(Resource):
             user = User.query.filter_by(email=get_jwt_identity()).first()
             train_log = LogTraining(
                 user.id,
+                data["project_name"],
                 data["step"],
                 data["batch"],
                 data["train_loss"],
@@ -107,6 +111,7 @@ class ValidationLog(Resource):
             user = User.query.filter_by(email=get_jwt_identity()).first()
             val_log = LogValidation(
                 user.id,
+                data["project_name"],
                 data["step"],
                 data["val_loss"],
                 data["val_accuracy"],
@@ -175,11 +180,19 @@ class Project(Resource):
 class ClearData(Resource):
     @jwt_required
     def delete(self):
+        data = request.json
         user = User.query.filter_by(email=get_jwt_identity()).first()
         meta = Base.metadata
         protected_tables = ["projects", "Users"]
         for table in reversed(meta.sorted_tables):
 
             if str(table.name) not in protected_tables and user != None:
-                db_session.execute(table.delete().where(table.c.user_id == user.id))
+                db_session.execute(
+                    table.delete().where(
+                        and_(
+                            table.c.user_id == user.id,
+                            table.c.project_name == data["project_name"],
+                        )
+                    )
+                )
         db_session.commit()

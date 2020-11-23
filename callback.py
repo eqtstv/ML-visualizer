@@ -55,12 +55,14 @@ def create_new_project(project_name, project_description):
 
 
 def write_data_train(
+    project_name,
     step,
     batch,
     train_loss,
     train_accuracy,
 ):
     train_data = {
+        "project_name": project_name,
         "step": step,
         "batch": batch,
         "train_accuracy": train_accuracy,
@@ -76,6 +78,7 @@ def write_data_train(
 
 
 def write_data_val(
+    project_name,
     step,
     val_loss,
     val_accuracy,
@@ -83,6 +86,7 @@ def write_data_val(
     epoch_time,
 ):
     val_data = {
+        "project_name": project_name,
         "step": step,
         "val_accuracy": val_accuracy,
         "val_loss": val_loss,
@@ -99,12 +103,13 @@ def write_data_val(
     return val_data
 
 
-def write_model_params(model, param_tracker):
+def write_model_params(model, param_tracker, project_name):
     params = {}
     if param_tracker:
         params.update(param_tracker.write_parameters())
         params.update(
             {
+                "project_name": project_name,
                 "no_tracked_steps": params["epochs"] * params["steps_in_batch"],
                 "total_params": model.count_params(),
             }
@@ -141,9 +146,11 @@ def write_model_summary(model):
     return model.to_json(), layer_params
 
 
-def clear_training_data():
+def clear_training_data(project_name):
     return requests.delete(
-        f"{URL}/clear", headers={"Authorization": f"Bearer {AuthToken.access_token}"}
+        f"{URL}/clear",
+        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
+        json={"project_name": project_name},
     )
 
 
@@ -207,7 +214,6 @@ class MLVisualizer(keras.callbacks.Callback):
         else:
             print(f"\n{auth_response.json()['msg']}\n")
             sys.exit()
-
         check_project_name = str(input("Project name: "))
         project_response = check_valid_project(check_project_name)
 
@@ -219,12 +225,13 @@ class MLVisualizer(keras.callbacks.Callback):
             decide = input()
 
             if decide == "yes":
-                name = input("Project name: ")
-                description = input("Project description: ")
-                project_response = create_new_project(name, description)
+                new_name = input("Project name: ")
+                new_description = input("Project description: ")
+                project_response = create_new_project(new_name, new_description)
 
             if project_response.status_code == 200:
                 print("\nProject successfully created.\n")
+                self.project_name = new_name
             else:
                 print(f"\n{project_response.json()['msg']}\n")
                 sys.exit()
@@ -233,15 +240,16 @@ class MLVisualizer(keras.callbacks.Callback):
         self.step = 0
 
     def on_train_begin(self, logs=None):
-        clear_training_data()
+        clear_training_data(self.project_name)
         self.param_tracker.get_model_parameters(self.params)
 
-        write_model_params(self.model, self.param_tracker)
+        write_model_params(self.model, self.param_tracker, self.project_name)
         write_model_summary(self.model)
 
     def on_train_batch_end(self, batch, logs=None):
         if batch % self.param_tracker.batch_split == 0:
             write_data_train(
+                self.project_name,
                 self.step,
                 batch,
                 logs["accuracy"],
@@ -257,6 +265,7 @@ class MLVisualizer(keras.callbacks.Callback):
         self.stop = timer()
         if "val_loss" in logs.keys():
             write_data_val(
+                self.project_name,
                 self.step,
                 logs["val_accuracy"],
                 logs["val_loss"],
@@ -266,6 +275,7 @@ class MLVisualizer(keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
         write_data_train(
+            self.project_name,
             self.step,
             self.param_tracker.no_steps - self.param_tracker.batch_split,
             logs["accuracy"],
@@ -273,6 +283,7 @@ class MLVisualizer(keras.callbacks.Callback):
         )
         if "val_loss" in logs.keys():
             write_data_val(
+                self.project_name,
                 self.step,
                 logs["val_accuracy"],
                 logs["val_loss"],

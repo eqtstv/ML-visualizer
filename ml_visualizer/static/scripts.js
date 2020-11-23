@@ -8,12 +8,10 @@ class ProjectsList extends HTMLElement {
     const container = document.getElementsByClassName("projects-container")[0];
 
     for (var i = 0; i < Object.keys(projects).length; i++) {
-      console.log(
-        projects["project" + i]["name"],
-        projects["project" + i]["description"]
-      );
       var cardDiv = document.createElement("div");
       cardDiv.setAttribute("class", "project-card");
+      cardDiv.setAttribute("id", "project" + i);
+
       var projectTitle = document.createElement("p");
       projectTitle.setAttribute("class", "project-title");
       var projectDescription = document.createElement("p");
@@ -23,6 +21,19 @@ class ProjectsList extends HTMLElement {
       );
       projectTitle.innerHTML = projects["project" + i]["name"];
       projectDescription.innerHTML = projects["project" + i]["description"];
+
+      cardDiv.onclick = (e) => {
+        e.stopPropagation();
+        console.log(e.target.children[0].innerHTML);
+      };
+      projectTitle.onclick = (e) => {
+        e.stopPropagation();
+        console.log(e.target.parentNode.children[0].innerHTML);
+      };
+      projectDescription.onclick = (e) => {
+        e.stopPropagation();
+        console.log(e.target.parentNode.children[0].innerHTML);
+      };
 
       cardDiv.appendChild(projectTitle);
       cardDiv.appendChild(projectDescription);

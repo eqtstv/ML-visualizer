@@ -27,10 +27,21 @@ def update_interval_log_update(interval_rate):
 
 
 @dash_app.callback(
-    Output("model-params-storage", "data"),
+    Output("current-project", "data"),
     [Input("interval-log-update", "n_intervals")],
 )
 def get_model_params(_):
+    try:
+        return requests.get(f"{URL}/params").json()["project_name"]
+    except:
+        return None
+
+
+@dash_app.callback(
+    Output("model-params-storage", "data"),
+    [Input("interval-log-update", "n_intervals"), Input("current-project", "data")],
+)
+def get_model_params(_, current_project):
     try:
         with engine.connect() as connection:
             model_params = pd.read_sql(
@@ -44,7 +55,8 @@ def get_model_params(_):
                 no_tracked_steps, \
                 total_params \
                 FROM model_params \
-                WHERE user_id=={current_user.id}",
+                WHERE user_id=={current_user.id} \
+                AND project_name=='{current_project}'",
                 connection,
             )
         return model_params.to_dict()
@@ -64,17 +76,19 @@ def get_model_params(_):
 
 
 @dash_app.callback(
-    Output("run-log-storage", "data"), [Input("interval-log-update", "n_intervals")]
+    Output("run-log-storage", "data"),
+    [Input("interval-log-update", "n_intervals"), Input("current-project", "data")],
 )
-def get_run_log(_):
+def get_run_log(_, current_project):
     try:
+        print(current_project)
         with engine.connect() as connection:
             df_train = pd.read_sql(
-                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id}",
+                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id} AND project_name=='{current_project}'",
                 connection,
             )
             df_val = pd.read_sql(
-                f"SELECT step, val_accuracy, val_loss, epoch, epoch_time FROM log_validation WHERE user_id=={current_user.id}",
+                f"SELECT step, val_accuracy, val_loss, epoch, epoch_time FROM log_validation WHERE user_id=={current_user.id} AND project_name=='{current_project}'",
                 connection,
             )
 
@@ -87,7 +101,7 @@ def get_run_log(_):
     try:
         with engine.connect() as connection:
             df_train = pd.read_sql(
-                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id}",
+                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id} AND project_name=='{current_project}'",
                 connection,
             )
         json = df_train.to_json(orient="split")

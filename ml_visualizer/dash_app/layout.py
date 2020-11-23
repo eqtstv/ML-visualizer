@@ -10,6 +10,7 @@ app_layout = dbc.Container(
             dcc.Store(id="run-log-storage", storage_type="memory"),
             dcc.Store(id="model-params-storage", storage_type="memory"),
             dcc.Store(id="model-summary-storage", storage_type="memory"),
+            dcc.Store(id="current-project", storage_type="memory"),
             dbc.Col(
                 dbc.Row(
                     [

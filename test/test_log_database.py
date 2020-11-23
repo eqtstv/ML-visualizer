@@ -1,7 +1,7 @@
 import unittest
 
 import sqlalchemy
-from sqlalchemy import inspect, Column, Float, Integer
+from sqlalchemy import inspect, Column, Float, Integer, String
 from ml_visualizer.database import Base, db_session, engine, init_db
 from ml_visualizer.models import LogTraining, LogValidation, User, Projects
 
@@ -32,12 +32,13 @@ class TestLogTraining(unittest.TestCase):
         valid_column_names = [
             "id",
             "user_id",
+            "project_name",
             "step",
             "batch",
             "train_accuracy",
             "train_loss",
         ]
-        valid_column_types = [Integer, Integer, Integer, Integer, Float, Float]
+        valid_column_types = [Integer, Integer, String, Integer, Integer, Float, Float]
 
         # THEN colums should have valid names and types
         for i, k in enumerate(columns):
@@ -46,13 +47,17 @@ class TestLogTraining(unittest.TestCase):
 
     def test_log_training_init(self):
         user_id = 1
+        project_name = "my_project"
         step = 1
         batch = 10
         train_acc = 0.7
         train_loss = 0.5
 
-        init_row = LogTraining(user_id, step, batch, train_acc, train_loss)
+        init_row = LogTraining(
+            user_id, project_name, step, batch, train_acc, train_loss
+        )
         self.assertEqual(init_row.user_id, user_id)
+        self.assertEqual(init_row.project_name, project_name)
         self.assertEqual(init_row.step, step)
         self.assertEqual(init_row.batch, batch)
         self.assertEqual(init_row.train_accuracy, train_acc)
@@ -71,13 +76,23 @@ class TestLogValidation(unittest.TestCase):
         valid_column_names = [
             "id",
             "user_id",
+            "project_name",
             "step",
             "val_accuracy",
             "val_loss",
             "epoch",
             "epoch_time",
         ]
-        valid_column_types = [Integer, Integer, Integer, Float, Float, Integer, Float]
+        valid_column_types = [
+            Integer,
+            Integer,
+            String,
+            Integer,
+            Float,
+            Float,
+            Integer,
+            Float,
+        ]
 
         # THEN colums should have valid names and types
         for i, k in enumerate(columns):
@@ -86,14 +101,18 @@ class TestLogValidation(unittest.TestCase):
 
     def test_log_validation_init(self):
         user_id = 1
+        project_name = "my_project"
         step = 10
         val_acc = 0.6
         val_loss = 0.7
         epoch = 3
         epoch_time = 4.2
 
-        init_row = LogValidation(user_id, step, val_acc, val_loss, epoch, epoch_time)
+        init_row = LogValidation(
+            user_id, project_name, step, val_acc, val_loss, epoch, epoch_time
+        )
         self.assertEqual(init_row.user_id, user_id)
+        self.assertEqual(init_row.project_name, project_name)
         self.assertEqual(init_row.step, step)
         self.assertEqual(init_row.val_accuracy, val_acc)
         self.assertEqual(init_row.val_loss, val_loss)

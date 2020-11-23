@@ -48,15 +48,23 @@ class LogTraining(Base):
     __tablename__ = "log_training"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("Users.id"))
+    project_name = Column(String(64), ForeignKey("projects.project_name"))
     step = Column(Integer)
     batch = Column(Integer)
     train_accuracy = Column(Float(50))
     train_loss = Column(Float(50))
 
     def __init__(
-        self, user_id=None, step=None, batch=None, train_accuracy=None, train_loss=None
+        self,
+        user_id=None,
+        project_name=None,
+        step=None,
+        batch=None,
+        train_accuracy=None,
+        train_loss=None,
     ):
         self.user_id = user_id
+        self.project_name = project_name
         self.step = step
         self.batch = batch
         self.train_accuracy = train_accuracy
@@ -70,6 +78,7 @@ class LogValidation(Base):
     __tablename__ = "log_validation"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("Users.id"))
+    project_name = Column(String(64), ForeignKey("projects.project_name"))
     step = Column(Integer)
     val_accuracy = Column(Float(50))
     val_loss = Column(Float(50))
@@ -79,6 +88,7 @@ class LogValidation(Base):
     def __init__(
         self,
         user_id=None,
+        project_name=None,
         step=None,
         val_accuracy=None,
         val_loss=None,
@@ -86,6 +96,7 @@ class LogValidation(Base):
         epoch_time=None,
     ):
         self.user_id = user_id
+        self.project_name = project_name
         self.step = step
         self.val_accuracy = val_accuracy
         self.val_loss = val_loss
@@ -100,6 +111,7 @@ class ModelParameters(Base):
     __tablename__ = "model_params"
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("Users.id"))
+    project_name = Column(String(64), ForeignKey("projects.project_name"))
     tracking_precision = Column(Float(50))
     no_steps = Column(Integer)
     epochs = Column(Integer)
@@ -112,6 +124,7 @@ class ModelParameters(Base):
     def __init__(
         self,
         user_id=None,
+        project_name=None,
         tracking_precision=None,
         no_steps=None,
         epochs=None,
@@ -122,6 +135,7 @@ class ModelParameters(Base):
         total_params=None,
     ):
         self.user_id = user_id
+        self.project_name = project_name
         self.tracking_precision = tracking_precision
         self.no_steps = no_steps
         self.epochs = epochs
