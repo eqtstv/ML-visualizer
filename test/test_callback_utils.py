@@ -369,33 +369,38 @@ class TestProgressDisplay(unittest.TestCase):
 
 class TestModelSummaryDivs(unittest.TestCase):
     def test_no_model_params(self):
-        result = get_model_summary_divs({}, model_summary)
+        project_name = "my_project"
+        result = get_model_summary_divs({}, model_summary, project_name)
         self.assertEqual(result, None)
 
     def test_no_model_summary(self):
-        result = get_model_summary_divs(model_params, {})
+        project_name = "my_project"
+        result = get_model_summary_divs(model_params, {}, project_name)
         self.assertEqual(result, None)
 
     def test_model_summary(self):
         # GIVEN known inputs
         # WHEN get_model_summary_divs() is ran with that input
-        result = get_model_summary_divs(model_params, model_summary)
+        project_name = "my_project"
+        result = get_model_summary_divs(model_params, model_summary, project_name)
 
         valid_result = (
-            html.Div(
-                children=[
-                    html.P("Model:"),
-                    html.P("Type: Sequential"),
-                    html.P("Name: sequential"),
-                ],
-                className="model-summary",
-            ),
             html.Div(
                 children=[
                     html.P("Number of layers:"),
                     html.P(3),
                     html.P("Total params:"),
                     html.P(101770),
+                ],
+                className="model-summary",
+            ),
+            html.Div(
+                children=[
+                    html.P("Project name:"),
+                    html.P(project_name),
+                    html.P("Model:"),
+                    html.P("Type: Sequential"),
+                    html.P("Name: sequential"),
                 ],
                 className="model-summary",
             ),

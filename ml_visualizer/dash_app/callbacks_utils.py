@@ -307,13 +307,15 @@ def update_progress_display(run_log_json, model_params):
             )
 
 
-def get_model_summary_divs(model_params, model_summary):
+def get_model_summary_divs(model_params, model_summary, current_project):
     if model_summary and model_params:
         input_layer_info = get_input_layer_info(model_summary)
         layers_info = get_layers(model_summary)
 
         model_class_name_div = html.Div(
             children=[
+                html.P("Project name:"),
+                html.P(current_project),
                 html.P("Model:"),
                 html.P(f"Type: {model_summary['class_name']}"),
                 html.P(f"Name: {model_summary['config']['name']}"),
@@ -347,4 +349,4 @@ def get_model_summary_divs(model_params, model_summary):
             className="model-summary",
         )
 
-        return model_class_name_div, model_layers_info, model_input_layer_info_div
+        return model_layers_info, model_class_name_div, model_input_layer_info_div

@@ -14,6 +14,7 @@ from ml_visualizer.api import (
     TrainingLog,
     ValidationLog,
     Project,
+    CurrentProject,
 )
 from ml_visualizer.auth import Auth
 from ml_visualizer.models import User
@@ -54,3 +55,4 @@ api.add_resource(ModelLayers, "/layers")
 api.add_resource(TrainingLog, "/train")
 api.add_resource(ValidationLog, "/val")
 api.add_resource(Project, "/project")
+api.add_resource(CurrentProject, "/current_project")

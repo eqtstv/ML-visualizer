@@ -177,6 +177,21 @@ class Project(Resource):
             print(e)
 
 
+class CurrentProject(Resource):
+    data = {}
+
+    def get(self):
+        return self.data
+
+    def put(self):
+        try:
+            self.data.update(request.json)
+            return self.data
+        except:
+            e = sys.exc_info()
+            print(e)
+
+
 class ClearData(Resource):
     @jwt_required
     def delete(self):

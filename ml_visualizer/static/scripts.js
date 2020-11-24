@@ -30,15 +30,75 @@ class ProjectsList extends HTMLElement {
 
       cardDiv.onclick = (e) => {
         e.stopPropagation();
-        console.log(e.target.children[0].innerHTML);
+        localStorage.setItem("current-project", e.target.children[0].innerHTML);
+        (async () => {
+          const rawResponse = await fetch(
+            "http://127.0.0.1:5050/current_project",
+            {
+              method: "PUT",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                current_project: localStorage.getItem("current-project"),
+              }),
+            }
+          );
+          const content = await rawResponse.json();
+
+          console.log(content);
+        })();
       };
       projectTitle.onclick = (e) => {
         e.stopPropagation();
-        console.log(e.target.parentNode.children[0].innerHTML);
+        localStorage.setItem(
+          "current-project",
+          e.target.parentNode.children[0].innerHTML
+        );
+        (async () => {
+          const rawResponse = await fetch(
+            "http://127.0.0.1:5050/current_project",
+            {
+              method: "PUT",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                current_project: localStorage.getItem("current-project"),
+              }),
+            }
+          );
+          const content = await rawResponse.json();
+
+          console.log(content);
+        })();
       };
       projectDescription.onclick = (e) => {
         e.stopPropagation();
-        console.log(e.target.parentNode.children[0].innerHTML);
+        localStorage.setItem(
+          "current-project",
+          e.target.parentNode.children[0].innerHTML
+        );
+        (async () => {
+          const rawResponse = await fetch(
+            "http://127.0.0.1:5050/current_project",
+            {
+              method: "PUT",
+              headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                current_project: localStorage.getItem("current-project"),
+              }),
+            }
+          );
+          const content = await rawResponse.json();
+
+          console.log(content);
+        })();
       };
 
       cardDiv.appendChild(projectTitle);

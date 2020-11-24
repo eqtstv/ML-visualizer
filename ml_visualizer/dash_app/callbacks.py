@@ -30,9 +30,9 @@ def update_interval_log_update(interval_rate):
     Output("current-project", "data"),
     [Input("interval-log-update", "n_intervals")],
 )
-def get_model_params(_):
+def get_current_project(_):
     try:
-        return requests.get(f"{URL}/params").json()["project_name"]
+        return requests.get(f"{URL}/current_project").json()["current_project"]
     except:
         return None
 
@@ -166,10 +166,14 @@ def update_div_current_loss_value(run_log_json):
 
 @dash_app.callback(
     Output("div-model-summary", "children"),
-    [Input("model-params-storage", "data"), Input("model-summary-storage", "data")],
+    [
+        Input("model-params-storage", "data"),
+        Input("model-summary-storage", "data"),
+        Input("current-project", "data"),
+    ],
 )
-def update_model_summary_divs(model_params, model_summary):
-    return get_model_summary_divs(model_params, model_summary)
+def update_model_summary_divs(model_params, model_summary, current_project):
+    return get_model_summary_divs(model_params, model_summary, current_project)
 
 
 @dash_app.callback(
