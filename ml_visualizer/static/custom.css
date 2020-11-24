@@ -98,3 +98,13 @@
   -moz-transition: transform 0.1s ease-in-out;
   -ms-transition: transform 0.1s ease-in-out;
 }
+[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+[type="radio"]:checked + div {
+  outline: 2px solid rgb(0, 0, 0);
+}

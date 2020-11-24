@@ -6,11 +6,17 @@ class ProjectsList extends HTMLElement {
     const toParse = exampleAttr.replace(/'/g, '"');
     const projects = JSON.parse(toParse);
     const container = document.getElementsByClassName("projects-container")[0];
+    const url = "http://127.0.0.1:5050/params";
 
     for (var i = 0; i < Object.keys(projects).length; i++) {
+      var labelWrap = document.createElement("label");
       var cardDiv = document.createElement("div");
+      var radioInput = document.createElement("input");
+
       cardDiv.setAttribute("class", "project-card");
-      cardDiv.setAttribute("id", "project" + i);
+
+      radioInput.setAttribute("type", "radio");
+      radioInput.setAttribute("name", "test");
 
       var projectTitle = document.createElement("p");
       projectTitle.setAttribute("class", "project-title");
@@ -37,7 +43,9 @@ class ProjectsList extends HTMLElement {
 
       cardDiv.appendChild(projectTitle);
       cardDiv.appendChild(projectDescription);
-      container.appendChild(cardDiv);
+      labelWrap.appendChild(radioInput);
+      labelWrap.appendChild(cardDiv);
+      container.appendChild(labelWrap);
     }
   }
 }
