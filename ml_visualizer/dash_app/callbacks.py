@@ -2,9 +2,8 @@ import dash_html_components as html
 import pandas as pd
 import requests
 from dash.dependencies import Input, Output
-from ml_visualizer.database import engine
+from flask_login import current_user
 from ml_visualizer.app import config
-from ml_visualizer.dash_app.dash_app import dash_app
 from ml_visualizer.dash_app.callbacks_utils import (
     get_model_summary_divs,
     update_current_value,
@@ -13,7 +12,8 @@ from ml_visualizer.dash_app.callbacks_utils import (
     update_progress_bars,
     update_progress_display,
 )
-from flask_login import current_user
+from ml_visualizer.dash_app.dash_app import dash_app
+from ml_visualizer.database import engine
 
 URL = f"http://{config['ip']}:{config['port']}"
 

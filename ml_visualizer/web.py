@@ -1,6 +1,7 @@
 from flask import make_response, render_template
-from flask_restful import Resource
 from flask_login import current_user, login_required
+from flask_restful import Resource
+
 from ml_visualizer.models import Projects
 
 

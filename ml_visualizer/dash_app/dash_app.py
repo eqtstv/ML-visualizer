@@ -1,9 +1,7 @@
 import dash
 import dash_bootstrap_components as dbc
 from ml_visualizer.app import server
-
 from ml_visualizer.dash_app.layout import app_layout
-
 
 dash_app = dash.Dash(
     __name__,

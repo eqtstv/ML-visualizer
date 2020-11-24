@@ -5,22 +5,21 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 
-from ml_visualizer.database import init_db
 from ml_visualizer.api import (
     ClearData,
+    CurrentProject,
     ModelLayers,
     ModelParams,
     ModelSummary,
+    Project,
     TrainingLog,
     ValidationLog,
-    Project,
-    CurrentProject,
 )
 from ml_visualizer.auth import Auth
+from ml_visualizer.database import init_db
 from ml_visualizer.models import User
 from ml_visualizer.user import Login, Logout, Signup, login_manager
 from ml_visualizer.web import DashApp, Index, Main, NotLogged, Profile
-
 
 CONFIG_PATH = pathlib.Path(__file__).parent.joinpath("config.json").resolve()
 with open(CONFIG_PATH) as f:

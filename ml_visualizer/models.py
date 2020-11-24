@@ -1,14 +1,13 @@
-from urllib.parse import urljoin, urlparse
-
 from flask import request
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
-from ml_visualizer.database import Base
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, JSON
+from sqlalchemy import JSON, Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired
+
+from ml_visualizer.database import Base
 
 
 class User(UserMixin, Base):
@@ -159,9 +158,3 @@ class ModelSummaryDB(Base):
         self.project_name = project_name
         self.class_name = class_name
         self.config = config
-
-
-def is_safe_url(target):
-    ref_url = urlparse(request.host_url)
-    test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc

@@ -1,3 +1,5 @@
+from urllib.parse import urljoin, urlparse
+
 from flask import (
     abort,
     flash,
@@ -15,9 +17,10 @@ from flask_login import (
     logout_user,
 )
 from flask_restful import Resource
-from ml_visualizer.database import db_session, Base
-from ml_visualizer.models import LoginForm, User, is_safe_url
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from ml_visualizer.database import Base, db_session
+from ml_visualizer.models import User
 
 login_manager = LoginManager()
 login_manager.login_view = "notlogged"
@@ -26,6 +29,12 @@ login_manager.login_view = "notlogged"
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
 
 
 class Signup(Resource):

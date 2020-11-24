@@ -25,10 +25,10 @@ def init_db():
     from ml_visualizer.models import (
         LogTraining,
         LogValidation,
-        Projects,
-        User,
         ModelParameters,
         ModelSummaryDB,
+        Projects,
+        User,
     )
 
     Base.metadata.create_all(bind=engine)
