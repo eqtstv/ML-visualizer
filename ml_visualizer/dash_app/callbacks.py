@@ -66,12 +66,23 @@ def get_model_params(_, current_project):
 
 @dash_app.callback(
     Output("model-summary-storage", "data"),
-    [Input("interval-log-update", "n_intervals")],
+    [Input("interval-log-update", "n_intervals"), Input("current-project", "data")],
 )
-def get_model_params(_):
+def get_model_summary(_, current_project):
     try:
-        return requests.get(f"{URL}/summary").json()
-    except:
+        with engine.connect() as connection:
+            model_summary = pd.read_sql(
+                f"SELECT \
+                class_name, \
+                config \
+                FROM model_summary \
+                WHERE user_id=={current_user.id} \
+                AND project_name=='{current_project}'",
+                connection,
+            )
+        return model_summary.to_dict()
+    except Exception as e:
+        print(e)
         return None
 
 
@@ -81,7 +92,6 @@ def get_model_params(_):
 )
 def get_run_log(_, current_project):
     try:
-        print(current_project)
         with engine.connect() as connection:
             df_train = pd.read_sql(
                 f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id} AND project_name=='{current_project}'",

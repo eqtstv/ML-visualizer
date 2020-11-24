@@ -28,6 +28,7 @@ def init_db():
         Projects,
         User,
         ModelParameters,
+        ModelSummaryDB,
     )
 
     Base.metadata.create_all(bind=engine)

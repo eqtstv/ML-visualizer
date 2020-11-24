@@ -2,6 +2,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import pandas as pd
 import plotly.graph_objs as go
+import json
 
 
 def update_graph(
@@ -185,33 +186,34 @@ def update_current_value(value_train, value_validation, value_title, run_log_jso
 
 
 def get_input_layer_info(summary):
-    if summary:
+    if "0" in summary["config"]:
+        config = json.loads(summary["config"]["0"])
         layer_info = {
-            "class_name": summary["config"]["layers"][0]["class_name"],
-            "name": summary["config"]["layers"][0]["config"]["name"],
-            "input_shape": summary["config"]["layers"][0]["config"][
-                "batch_input_shape"
-            ],
+            "class_name": config["layers"][0]["class_name"],
+            "name": config["layers"][0]["config"]["name"],
+            "input_shape": config["layers"][0]["config"]["batch_input_shape"],
         }
         return layer_info
 
 
 def get_layers(summary):
     layers = []
+    if "0" in summary["config"]:
+        config = json.loads(summary["config"]["0"])
 
-    def get_layer_info(layer):
-        layer_info = {
-            "Type": layer["class_name"],
-            "name": layer["config"]["name"],
-        }
+        def get_layer_info(layer):
+            layer_info = {
+                "Type": layer["class_name"],
+                "name": layer["config"]["name"],
+            }
 
-        if layer["class_name"] == "Dense":
-            layer_info["units"] = layer["config"]["units"]
-            layer_info["activation"] = layer["config"]["activation"]
-        return layer_info
+            if layer["class_name"] == "Dense":
+                layer_info["units"] = layer["config"]["units"]
+                layer_info["activation"] = layer["config"]["activation"]
+            return layer_info
 
-    for i, layer in enumerate(summary["config"]["layers"]):
-        layers.append(get_layer_info(layer))
+        for i, layer in enumerate(config["layers"]):
+            layers.append(get_layer_info(layer))
 
     return layers
 
@@ -308,17 +310,17 @@ def update_progress_display(run_log_json, model_params):
 
 
 def get_model_summary_divs(model_params, model_summary, current_project):
-    if model_summary and model_params:
+    if model_summary and model_params and "0" in model_summary["config"]:
         input_layer_info = get_input_layer_info(model_summary)
         layers_info = get_layers(model_summary)
-
+        config = json.loads(model_summary["config"]["0"])
         model_class_name_div = html.Div(
             children=[
                 html.P("Project name:"),
                 html.P(current_project),
                 html.P("Model:"),
-                html.P(f"Type: {model_summary['class_name']}"),
-                html.P(f"Name: {model_summary['config']['name']}"),
+                html.P(f"Type: {model_summary['class_name']['0']}"),
+                html.P(f"Name: {config['name']}"),
             ],
             className="model-summary",
         )

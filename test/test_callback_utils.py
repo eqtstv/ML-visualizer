@@ -52,76 +52,29 @@ run_log_json_with_validation = {
 }
 
 model_summary = {
-    "class_name": "Sequential",
+    "class_name": {"0": "Sequential"},
     "config": {
-        "name": "sequential",
-        "layers": [
-            {
-                "class_name": "InputLayer",
-                "config": {
-                    "batch_input_shape": [None, 28, 28],
-                    "dtype": "float32",
-                    "sparse": False,
-                    "ragged": False,
-                    "name": "flatten_input",
-                },
-            },
-            {
-                "class_name": "Flatten",
-                "config": {
-                    "name": "flatten",
-                    "trainable": True,
-                    "batch_input_shape": [None, 28, 28],
-                    "dtype": "float32",
-                    "data_format": "channels_last",
-                },
-            },
-            {
-                "class_name": "Dense",
-                "config": {
-                    "name": "dense",
-                    "trainable": True,
-                    "dtype": "float32",
-                    "units": 128,
-                    "activation": "relu",
-                    "use_bias": True,
-                    "kernel_initializer": {
-                        "class_name": "GlorotUniform",
-                        "config": {"seed": None},
-                    },
-                    "bias_initializer": {"class_name": "Zeros", "config": {}},
-                    "kernel_regularizer": None,
-                    "bias_regularizer": None,
-                    "activity_regularizer": None,
-                    "kernel_constraint": None,
-                    "bias_constraint": None,
-                },
-            },
-            {
-                "class_name": "Dense",
-                "config": {
-                    "name": "dense_1",
-                    "trainable": True,
-                    "dtype": "float32",
-                    "units": 10,
-                    "activation": "linear",
-                    "use_bias": True,
-                    "kernel_initializer": {
-                        "class_name": "GlorotUniform",
-                        "config": {"seed": None},
-                    },
-                    "bias_initializer": {"class_name": "Zeros", "config": {}},
-                    "kernel_regularizer": None,
-                    "bias_regularizer": None,
-                    "activity_regularizer": None,
-                    "kernel_constraint": None,
-                    "bias_constraint": None,
-                },
-            },
-        ],
+        "0": '{"name": "sequential", "layers": \
+        [{"class_name": "InputLayer", \
+        "config": {"batch_input_shape": [null, 28, 28],\
+        "dtype": "float32", "sparse": false, "ragged": false, "name": "flatten_input"}},\
+        {"class_name": "Flatten", "config": {"name": "flatten", "trainable": true,\
+        "batch_input_shape": [null, 28, 28], "dtype": "float32", "data_format": "channels_last"}},\
+        {"class_name": "Dense", "config": \
+        {"name": "dense", "trainable": true, "dtype": "float32", "units": 128, "activation": "relu",\
+        "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}},\
+        "bias_initializer": {"class_name": "Zeros", "config": {}}, \
+        "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer":\
+        null, "kernel_constraint": null, "bias_constraint": null}}, \
+        {"class_name": "Dense", "config": {"name": "dense_1", \
+        "trainable": true, "dtype": "float32", "units": 10, "activation": "linear", \
+        "use_bias": true, "kernel_initializer": \
+        {"class_name": "GlorotUniform", "config": {"seed": null}},\
+        "bias_initializer": {"class_name": "Zeros", "config": {}},\
+        "kernel_regularizer": null, "bias_regularizer": null,\
+        "activity_regularizer": null, "kernel_constraint":\
+        null, "bias_constraint": null}}]}'
     },
-    "keras_version": "2.4.0",
-    "backend": "tensorflow",
 }
 
 model_params = {

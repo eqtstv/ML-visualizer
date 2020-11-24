@@ -124,17 +124,22 @@ def write_model_params(model, param_tracker, project_name):
     return params
 
 
-def write_model_summary(model):
+def write_model_summary(model, project_name):
     model_summary = str(model.to_json())
+    model_summary_json = json.loads(model_summary)
+    model_summary_json.update({"project_name": project_name})
+
     layer_params = {
         "layers": [
             (layer.get_config(), {"no_params": layer.count_params()})
             for layer in model.layers
         ]
     }
+    layer_params.update({"project_name": project_name})
+
     requests.put(
         f"{URL}/summary",
-        json=json.loads(model_summary),
+        json=model_summary_json,
         headers={"Authorization": f"Bearer {AuthToken.access_token}"},
     )
     requests.put(
@@ -143,7 +148,7 @@ def write_model_summary(model):
         headers={"Authorization": f"Bearer {AuthToken.access_token}"},
     )
 
-    return model.to_json(), layer_params
+    return model_summary_json, layer_params
 
 
 def clear_training_data(project_name):
@@ -244,7 +249,7 @@ class MLVisualizer(keras.callbacks.Callback):
         self.param_tracker.get_model_parameters(self.params)
 
         write_model_params(self.model, self.param_tracker, self.project_name)
-        write_model_summary(self.model)
+        write_model_summary(self.model, self.project_name)
 
     def on_train_batch_end(self, batch, logs=None):
         if batch % self.param_tracker.batch_split == 0:

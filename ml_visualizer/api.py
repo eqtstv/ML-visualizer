@@ -10,6 +10,7 @@ from ml_visualizer.models import (
     LogTraining,
     LogValidation,
     ModelParameters,
+    ModelSummaryDB,
     Projects,
     User,
 )
@@ -57,10 +58,18 @@ class ModelSummary(Resource):
     def put(self):
         try:
             self.data.update(request.json)
+            user = User.query.filter_by(email=get_jwt_identity()).first()
+            model_summary = ModelSummaryDB(
+                user.id,
+                self.data["project_name"],
+                self.data["class_name"],
+                self.data["config"],
+            )
+            db_session.add(model_summary)
+            db_session.commit()
         except:
             e = sys.exc_info()
             print(e)
-
         return jsonify(self.data)
 
 

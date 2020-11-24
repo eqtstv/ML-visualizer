@@ -1,18 +1,19 @@
+import json
 import unittest
-import requests
 
+import requests
 import tensorflow as tf
 from callback import (
     AuthToken,
-    authenticate_user,
     ParametersTracker,
+    authenticate_user,
+    check_valid_project,
+    clear_training_data,
+    create_new_project,
     write_data_train,
     write_data_val,
     write_model_params,
     write_model_summary,
-    create_new_project,
-    check_valid_project,
-    clear_training_data,
 )
 from ml_visualizer.app import config
 from ml_visualizer.database import Base, db_session
@@ -239,17 +240,23 @@ class TestCallback(unittest.TestCase):
     def test_write_model_summary(self):
         # GIVEN model
         model = get_model()
+        project_name = "my_project"
 
         # WHEN write_model_summary() is ran with that input
-        result = write_model_summary(model)
+        result = write_model_summary(model, project_name)
 
         # THEN is should return valid model summary
-        valid_model_summary = str(model.to_json())
+        model_summary = str(model.to_json())
+        valid_model_summary = json.loads(model_summary)
+        valid_model_summary.update({"project_name": project_name})
 
         self.assertEqual(result[0], valid_model_summary)
 
         # AND valid model_layers
-        valid_model_layers = {"layers": [({"name": "flatten_1"})]}
+        valid_model_layers = {
+            "layers": [({"name": "flatten_1"})],
+            "project_name": project_name,
+        }
 
         self.assertEqual(result[1].keys(), valid_model_layers.keys())
         clear_data()

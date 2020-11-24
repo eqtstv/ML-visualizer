@@ -4,7 +4,7 @@ from flask import request
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from ml_visualizer.database import Base
-from sqlalchemy import Column, Float, ForeignKey, Integer, String
+from sqlalchemy import Column, Float, ForeignKey, Integer, String, JSON
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
@@ -144,6 +144,21 @@ class ModelParameters(Base):
         self.steps_in_batch = steps_in_batch
         self.no_tracked_steps = no_tracked_steps
         self.total_params = total_params
+
+
+class ModelSummaryDB(Base):
+    __tablename__ = "model_summary"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("Users.id"))
+    project_name = Column(String(64), ForeignKey("projects.project_name"))
+    class_name = Column(String(64))
+    config = Column(JSON)
+
+    def __init__(self, user_id=None, project_name=None, class_name=None, config=None):
+        self.user_id = user_id
+        self.project_name = project_name
+        self.class_name = class_name
+        self.config = config
 
 
 class LoginForm(FlaskForm):
