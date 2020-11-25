@@ -282,7 +282,7 @@ class MLVisualizer(keras.callbacks.Callback):
         write_data_train(
             self.project_name,
             self.step,
-            self.param_tracker.no_steps - self.param_tracker.batch_split,
+            self.param_tracker.batch_split * (self.param_tracker.steps_in_batch - 1),
             logs["accuracy"],
             logs["loss"],
         )
