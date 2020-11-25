@@ -44,6 +44,7 @@ class ProjectsList extends HTMLElement {
         e.stopPropagation();
         localStorage.setItem("current-project", e.target.children[0].innerHTML);
         sendCurrentProject();
+        window.location.replace("http://127.0.0.1:5050/dashapp");
       };
       projectTitle.onclick = (e) => {
         e.stopPropagation();
@@ -52,6 +53,7 @@ class ProjectsList extends HTMLElement {
           e.target.parentNode.children[0].innerHTML
         );
         sendCurrentProject();
+        window.location.replace("http://127.0.0.1:5050/dashapp");
       };
       projectDescription.onclick = (e) => {
         e.stopPropagation();
@@ -60,6 +62,7 @@ class ProjectsList extends HTMLElement {
           e.target.parentNode.children[0].innerHTML
         );
         sendCurrentProject();
+        window.location.replace("http://127.0.0.1:5050/dashapp");
       };
 
       cardDiv.appendChild(projectTitle);
