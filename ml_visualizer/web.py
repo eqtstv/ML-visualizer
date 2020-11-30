@@ -1,4 +1,4 @@
-from flask import make_response, render_template
+from flask import make_response, render_template, request
 from flask_login import current_user, login_required
 from flask_restful import Resource
 
@@ -44,7 +44,10 @@ class Profile(Resource):
     def get(self):
         return make_response(
             render_template(
-                "profile.html", user=current_user, projects=get_all_user_projects()
+                "profile.html",
+                user=current_user,
+                projects=get_all_user_projects(),
+                url_root=request.url_root,
             ),
             200,
             {"Content-Type": "text/html"},
@@ -64,7 +67,9 @@ class DashApp(Resource):
     @login_required
     def get(self):
         return make_response(
-            render_template("dash_app.html", user=current_user),
+            render_template(
+                "dash_app.html", user=current_user, url_root=request.url_root
+            ),
             200,
             {"Content-Type": "text/html"},
         )

@@ -2,7 +2,7 @@ class ProjectsList extends HTMLElement {
   constructor() {
     super();
     let sendCurrentProject = async () => {
-      const rawResponse = await fetch("http://127.0.0.1:5050/current_project", {
+      const rawResponse = await fetch(url_root + "current_project", {
         method: "PUT",
         headers: {
           Accept: "application/json",
@@ -12,10 +12,12 @@ class ProjectsList extends HTMLElement {
           current_project: localStorage.getItem("current-project"),
         }),
       });
+      window.location.replace(url_root + "dashapp");
     };
 
     const data = document.getElementById("data-container");
     const exampleAttr = data.getAttribute("data-");
+    const url_root = data.getAttribute("url_root");
     const toParse = exampleAttr.replace(/'/g, '"');
     const projects = JSON.parse(toParse);
     const container = document.getElementsByClassName("projects-container")[0];
@@ -44,7 +46,6 @@ class ProjectsList extends HTMLElement {
         e.stopPropagation();
         localStorage.setItem("current-project", e.target.children[0].innerHTML);
         sendCurrentProject();
-        window.location.replace("http://127.0.0.1:5050/dashapp");
       };
       projectTitle.onclick = (e) => {
         e.stopPropagation();
@@ -53,7 +54,6 @@ class ProjectsList extends HTMLElement {
           e.target.parentNode.children[0].innerHTML
         );
         sendCurrentProject();
-        window.location.replace("http://127.0.0.1:5050/dashapp");
       };
       projectDescription.onclick = (e) => {
         e.stopPropagation();
@@ -62,7 +62,6 @@ class ProjectsList extends HTMLElement {
           e.target.parentNode.children[0].innerHTML
         );
         sendCurrentProject();
-        window.location.replace("http://127.0.0.1:5050/dashapp");
       };
 
       cardDiv.appendChild(projectTitle);

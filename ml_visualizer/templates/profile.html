@@ -1,6 +1,10 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
-  <div id="data-container" data-="{{ projects }}"></div>
+  <div
+    id="data-container"
+    data-="{{ projects }}"
+    url_root="{{ url_root }}"
+  ></div>
   <h1 class="title">Welcome, {{ current_user.username }}!</h1>
   <h2 class="subtitle">Here are your projects</h2>
 

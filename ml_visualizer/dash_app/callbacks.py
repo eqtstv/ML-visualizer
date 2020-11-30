@@ -14,8 +14,7 @@ from ml_visualizer.dash_app.callbacks_utils import (
 )
 from ml_visualizer.dash_app.dash_app import dash_app
 from ml_visualizer.database import engine
-
-URL = f"http://{config['ip']}:{config['port']}"
+from flask import request
 
 
 @dash_app.callback(
@@ -32,7 +31,9 @@ def update_interval_log_update(interval_rate):
 )
 def get_current_project(_):
     try:
-        return requests.get(f"{URL}/current_project").json()["current_project"]
+        return requests.get(f"{request.url_root}/current_project").json()[
+            "current_project"
+        ]
     except:
         return None
 
