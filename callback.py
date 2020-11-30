@@ -207,7 +207,7 @@ class MLVisualizer(keras.callbacks.Callback):
         keras.callbacks.Callback
     """
 
-    def __init__(self, tracking_precision=0.05):
+    def __init__(self, tracking_precision=0.01):
         email = input("Email: ")
         password = getpass()
 
