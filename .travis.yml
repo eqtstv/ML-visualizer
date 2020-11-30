@@ -5,5 +5,5 @@ install:
   - pip install -r requirements.txt
 script:
   - chmod u+r+x run_tests_travis.bat
-  - python run.py &
+  - python run.py debug &
   - ./run_tests_travis.bat
