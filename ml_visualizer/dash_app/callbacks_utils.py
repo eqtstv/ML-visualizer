@@ -46,7 +46,7 @@ def update_graph(
             if y_val_index in run_log_df:
                 y_val = run_log_df[y_val_index]
             else:
-                y_val = pd.Series()
+                y_val = pd.Series(dtype=object)
 
             if not y_train.isnull().values.any():
 
