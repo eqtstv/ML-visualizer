@@ -1,7 +1,10 @@
 import json
+import os
 import unittest
 
 import requests
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import tensorflow as tf
 from callback import (
     AuthToken,
