@@ -229,7 +229,7 @@ class MLVisualizer(keras.callbacks.Callback):
             print(f"\n{project_response.json()['msg']}\n")
             decide = input()
 
-            if decide == "yes":
+            if decide == "y":
                 new_name = input("Project name: ")
                 new_description = input("Project description: ")
                 project_response = create_new_project(new_name, new_description)
@@ -237,6 +237,12 @@ class MLVisualizer(keras.callbacks.Callback):
             if project_response.status_code == 200:
                 print("\nProject successfully created.\n")
                 self.project_name = new_name
+                print("Start training? y/n")
+                decide = input()
+
+                if decide != "y":
+                    sys.exit()
+
             else:
                 print(f"\n{project_response.json()['msg']}\n")
                 sys.exit()
