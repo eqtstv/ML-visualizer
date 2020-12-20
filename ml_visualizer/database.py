@@ -9,7 +9,7 @@ file_path = os.path.abspath(os.getcwd()) + "/ml_visualizer.db"
 engine = create_engine(
     f"sqlite:///{file_path}",
     convert_unicode=True,
-    connect_args={"check_same_thread": False},
+    connect_args={"check_same_thread": False, "timeout": 15},
 )
 db_session = scoped_session(
     sessionmaker(autocommit=False, autoflush=False, bind=engine)
