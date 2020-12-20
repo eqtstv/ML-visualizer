@@ -2,7 +2,6 @@ import json
 import unittest
 
 import dash_html_components as html
-import pandas as pd
 import plotly
 from ml_visualizer.dash_app.callbacks_utils import (
     get_input_layer_info,
@@ -57,12 +56,16 @@ model_summary = {
         "0": '{"name": "sequential", "layers": \
         [{"class_name": "InputLayer", \
         "config": {"batch_input_shape": [null, 28, 28],\
-        "dtype": "float32", "sparse": false, "ragged": false, "name": "flatten_input"}},\
+        "dtype": "float32", "sparse": false, \
+        "ragged": false, "name": "flatten_input"}},\
         {"class_name": "Flatten", "config": {"name": "flatten", "trainable": true,\
-        "batch_input_shape": [null, 28, 28], "dtype": "float32", "data_format": "channels_last"}},\
+        "batch_input_shape": [null, 28, 28], "dtype": "float32", \
+        "data_format": "channels_last"}},\
         {"class_name": "Dense", "config": \
-        {"name": "dense", "trainable": true, "dtype": "float32", "units": 128, "activation": "relu",\
-        "use_bias": true, "kernel_initializer": {"class_name": "GlorotUniform", "config": {"seed": null}},\
+        {"name": "dense", "trainable": true, "dtype": "float32", \
+        "units": 128, "activation": "relu",\
+        "use_bias": true, "kernel_initializer": \
+        {"class_name": "GlorotUniform", "config": {"seed": null}},\
         "bias_initializer": {"class_name": "Zeros", "config": {}}, \
         "kernel_regularizer": null, "bias_regularizer": null, "activity_regularizer":\
         null, "kernel_constraint": null, "bias_constraint": null}}, \

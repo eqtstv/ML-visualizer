@@ -3,8 +3,6 @@ import os
 import unittest
 
 import requests
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import tensorflow as tf
 from callback import (
     AuthToken,
@@ -20,6 +18,8 @@ from callback import (
 )
 from ml_visualizer.app import config
 from ml_visualizer.database import Base, db_session
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 def clear_data():
@@ -93,7 +93,8 @@ class TestProjects(unittest.TestCase):
         self.assertEqual(
             r.json(),
             {
-                "msg": "Invalid project name!\nDo you want to create new project? (yes/no)"
+                "msg": "Invalid project name!\n \
+                Do you want to create new project? (yes/no)"
             },
         )
 
@@ -137,7 +138,7 @@ class TestCallback(unittest.TestCase):
             "train_loss": train_loss,
         }
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
-        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
+        requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
         AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
             "access_token"
@@ -169,7 +170,7 @@ class TestCallback(unittest.TestCase):
             "epoch_time": epoch_time,
         }
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
-        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
+        requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
         AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
             "access_token"
@@ -194,7 +195,7 @@ class TestCallback(unittest.TestCase):
         # THEN write_parameters() should return valid dictiorany
         result = param_tracker.write_parameters()
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
-        r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
+        requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
         AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
             "access_token"
