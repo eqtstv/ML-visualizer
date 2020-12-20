@@ -26,5 +26,5 @@ jobs:
       - name: Run Tests
         run: |
           python run.py debug &
-          timeout 5
+          sleep 10
           python -m unittest discover
