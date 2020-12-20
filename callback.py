@@ -1,14 +1,9 @@
-import csv
 import json
-import os
-import pathlib
-import shutil
 import sys
-from getpass import getpass, getuser
+from getpass import getpass
 from timeit import default_timer as timer
 
 import requests
-import tensorflow as tf
 from tensorflow import keras
 
 # leave it for tests
