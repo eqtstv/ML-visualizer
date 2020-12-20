@@ -157,7 +157,8 @@ def update_current_value(value_train, value_validation, value_title, run_log_jso
 
             val_div = (
                 html.Div(
-                    f"Validation: {run_log_df[value_validation].iloc[last_val_index]:.4f}"
+                    f"Validation: \
+                      {run_log_df[value_validation].iloc[last_val_index]:.4f}"
                 ),
             )
             return [
@@ -274,7 +275,8 @@ def update_progress_display(run_log_json, model_params):
 
             steps_div = (
                 html.P(
-                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} / {model_params['no_steps']['0']}"
+                    f"Batch: {run_log_df['batch'].iloc[-1] + residue} \
+                      / {model_params['no_steps']['0']}"
                 ),
             )
 
@@ -288,12 +290,7 @@ def update_progress_display(run_log_json, model_params):
             last_val_index = run_log_df["epoch"].last_valid_index()
             epoch = run_log_df["epoch"].iloc[last_val_index] + 1
 
-            et = run_log_df["epoch_time"].iloc[last_val_index]
-            eta = et * model_params["epochs"]["0"]
-
             epochs_div = html.P(f"Epoch: {epoch:.0f} / {model_params['epochs']['0']}")
-            epoch_time_div = html.P(f"Epoch time: {et:.4f} s.")
-            eta_div = html.P(f"Estimated training time: {eta:.4f} s.")
 
             return html.Div(
                 children=[
@@ -328,17 +325,12 @@ def get_model_summary_divs(model_params, model_summary, current_project):
 
         model_input_layer_info_div = html.Div(
             children=[
-                html.P(f"Input shape:"),
+                html.P("Input shape:"),
                 html.P(f"{input_layer_info['input_shape']}"),
-                html.P(f"Output:"),
+                html.P("Output:"),
                 html.P(f"Units: {layers_info[-1]['units']}"),
                 html.P(f"Activation: {layers_info[-1]['activation']}"),
             ],
-            className="model-summary",
-        )
-
-        model_layers_div = html.Div(
-            children=[html.P("Layers:"), html.Div(layers_info)],
             className="model-summary",
         )
 
