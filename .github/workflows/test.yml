@@ -17,7 +17,9 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
       - name: Run Pytest
-        run: python -m unittest discover
+        run: |
+          python run.py debug
+          python -m unittest discover
 
   linter:
     name: Indentation  Linter
