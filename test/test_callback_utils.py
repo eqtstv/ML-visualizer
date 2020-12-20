@@ -300,7 +300,9 @@ class TestProgressDisplay(unittest.TestCase):
             html.P("Tracking precision: 0.01"),
         ]
 
-        self.assertEqual(" ".join(result[0].children.split()), valid_result[0].children)
+        self.assertEqual(
+            " ".join(result.children[0].children.split()), valid_result[0].children
+        )
         self.assertEqual(result.children[1].children, valid_result[1].children)
         self.assertEqual(result.children[2].children, valid_result[2].children)
 
@@ -318,9 +320,13 @@ class TestProgressDisplay(unittest.TestCase):
             html.P("Tracking precision: 0.01"),
         ]
 
-        self.assertEqual(" ".join(result[0].children.split()), valid_result[0].children)
+        self.assertEqual(
+            " ".join(result.children[0].children.split()), valid_result[0].children
+        )
         self.assertEqual(result.children[1].children, valid_result[1].children)
-        self.assertEqual(" ".join(result[0].children.split()), valid_result[2].children)
+        self.assertEqual(
+            " ".join(result.children[2].children.split()), valid_result[2].children
+        )
 
 
 class TestModelSummaryDivs(unittest.TestCase):
