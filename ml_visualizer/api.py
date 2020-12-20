@@ -150,7 +150,8 @@ class Project(Resource):
                 return make_response(
                     jsonify(
                         {
-                            "msg": "Invalid project name!\nDo you want to create new project? (yes/no)"
+                            "msg": "Invalid project name!\n \
+                            Do you want to create new project? (y/n)"
                         }
                     ),
                     401,
