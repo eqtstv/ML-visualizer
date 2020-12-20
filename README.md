@@ -11,3 +11,6 @@
 ![Tensorflow](https://img.shields.io/badge/tensorflow-2.3.1-orange?style=flat-square)
 
 Application for visualizing machine learning process parameters
+
+
+![live](https://user-images.githubusercontent.com/38236287/102703099-05bae380-426b-11eb-9960-a73e386bdca1.gif)
