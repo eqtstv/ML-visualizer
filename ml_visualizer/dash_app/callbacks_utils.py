@@ -329,7 +329,7 @@ def get_model_summary_divs(model_params, model_summary, current_project):
                 html.P(f"{input_layer_info['input_shape']}"),
                 html.P("Output:"),
                 html.P(f"Units: {layers_info[-1]['units']}"),
-                html.P("Activation: {layers_info[-1]['activation']}"),
+                html.P(f"Activation: {layers_info[-1]['activation']}"),
             ],
             className="model-summary",
         )
