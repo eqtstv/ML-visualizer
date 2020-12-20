@@ -94,7 +94,7 @@ class TestProjects(unittest.TestCase):
             r.json(),
             {
                 "msg": "Invalid project name!\n \
-                Do you want to create new project? (y/n)"
+                            Do you want to create new project? (y/n)"
             },
         )
 
