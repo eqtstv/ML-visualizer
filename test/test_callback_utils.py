@@ -161,7 +161,7 @@ class TestUpdateCurrentValueAccuracy(unittest.TestCase):
         # THEN it should return proper name and value
         self.assertEqual(result[0].children, "Current Accuracy:")
         self.assertEqual(result[1].children, "Training: 0.9063")
-        self.assertEqual(result[2].children, "Validation: 0.8365")
+        self.assertEqual(" ".join(result[2].children.split()), "Validation: 0.8365")
 
 
 class TestUpdateCurrentValueLoss(unittest.TestCase):
@@ -196,7 +196,7 @@ class TestUpdateCurrentValueLoss(unittest.TestCase):
         # THEN it should return proper name and value
         self.assertEqual(result[0].children, "Current Loss:")
         self.assertEqual(result[1].children, "Training: 0.2021")
-        self.assertEqual(result[2].children, "Validation: 0.4435")
+        self.assertEqual(" ".join(result[2].children.split()), "Validation: 0.4435")
 
 
 class TestGetInputLayerInfo(unittest.TestCase):
@@ -300,7 +300,7 @@ class TestProgressDisplay(unittest.TestCase):
             html.P("Tracking precision: 0.01"),
         ]
 
-        self.assertEqual(result.children[0].children, valid_result[0].children)
+        self.assertEqual(" ".join(result[0].children.split()), valid_result[0].children)
         self.assertEqual(result.children[1].children, valid_result[1].children)
         self.assertEqual(result.children[2].children, valid_result[2].children)
 
@@ -318,9 +318,9 @@ class TestProgressDisplay(unittest.TestCase):
             html.P("Tracking precision: 0.01"),
         ]
 
-        self.assertEqual(result.children[0].children, valid_result[0].children)
+        self.assertEqual(" ".join(result[0].children.split()), valid_result[0].children)
         self.assertEqual(result.children[1].children, valid_result[1].children)
-        self.assertEqual(result.children[2].children, valid_result[2].children)
+        self.assertEqual(" ".join(result[0].children.split()), valid_result[2].children)
 
 
 class TestModelSummaryDivs(unittest.TestCase):
