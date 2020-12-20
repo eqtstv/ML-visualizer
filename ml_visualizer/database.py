@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
 
-file_path = os.path.abspath(os.getcwd()) + "\ml_visualizer.db"
+file_path = os.path.abspath(os.getcwd()) + "/ml_visualizer.db"
 
 engine = create_engine(
     f"sqlite:///{file_path}",

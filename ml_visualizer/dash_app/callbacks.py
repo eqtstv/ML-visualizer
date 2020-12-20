@@ -1,9 +1,8 @@
-import dash_html_components as html
 import pandas as pd
 import requests
 from dash.dependencies import Input, Output
+from flask import request
 from flask_login import current_user
-from ml_visualizer.app import config
 from ml_visualizer.dash_app.callbacks_utils import (
     get_model_summary_divs,
     update_current_value,
@@ -14,7 +13,6 @@ from ml_visualizer.dash_app.callbacks_utils import (
 )
 from ml_visualizer.dash_app.dash_app import dash_app
 from ml_visualizer.database import engine
-from flask import request
 
 
 @dash_app.callback(
@@ -34,8 +32,8 @@ def get_current_project(_):
         return requests.get(f"{request.url_root}/current_project").json()[
             "current_project"
         ]
-    except:
-        return None
+    except Exception as e:
+        print(e)
 
 
 @dash_app.callback(
@@ -61,8 +59,8 @@ def get_model_params(_, current_project):
                 connection,
             )
         return model_params.to_dict()
-    except:
-        return None
+    except Exception as e:
+        print(e)
 
 
 @dash_app.callback(
@@ -95,30 +93,36 @@ def get_run_log(_, current_project):
     try:
         with engine.connect() as connection:
             df_train = pd.read_sql(
-                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id} AND project_name=='{current_project}'",
+                f"SELECT step, batch, train_accuracy, train_loss \
+                  FROM log_training WHERE user_id=={current_user.id} \
+                  AND project_name=='{current_project}'",
                 connection,
             )
             df_val = pd.read_sql(
-                f"SELECT step, val_accuracy, val_loss, epoch, epoch_time FROM log_validation WHERE user_id=={current_user.id} AND project_name=='{current_project}'",
+                f"SELECT step, val_accuracy, val_loss, epoch, epoch_time \
+                  FROM log_validation WHERE user_id=={current_user.id} \
+                  AND project_name=='{current_project}'",
                 connection,
             )
 
         run_log_df = pd.merge(df_train, df_val, on="step", how="left")
         json = run_log_df.to_json(orient="split")
         return json
-    except:
-        return None
+    except Exception as e:
+        print(e)
 
     try:
         with engine.connect() as connection:
             df_train = pd.read_sql(
-                f"SELECT step, batch, train_accuracy, train_loss FROM log_training WHERE user_id=={current_user.id} AND project_name=='{current_project}'",
+                f"SELECT step, batch, train_accuracy, train_loss \
+                  FROM log_training WHERE user_id=={current_user.id} \
+                  AND project_name=='{current_project}'",
                 connection,
             )
         json = df_train.to_json(orient="split")
         return json
-    except:
-        return None
+    except Exception as e:
+        print(e)
 
 
 @dash_app.callback(

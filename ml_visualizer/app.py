@@ -17,7 +17,6 @@ from ml_visualizer.api import (
 )
 from ml_visualizer.auth import Auth
 from ml_visualizer.database import init_db
-from ml_visualizer.models import User
 from ml_visualizer.user import Login, Logout, Signup, login_manager
 from ml_visualizer.web import DashApp, Index, Main, NotLogged, Profile
 

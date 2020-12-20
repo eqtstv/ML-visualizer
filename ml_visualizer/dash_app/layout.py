@@ -17,11 +17,11 @@ app_layout = dbc.Container(
                         html.Div(
                             children=[
                                 html.Div(
-                                    id=f"div-accuracy-graph",
+                                    id="div-accuracy-graph",
                                     className="chart-graph",
                                 ),
                                 html.Div(
-                                    id=f"div-loss-graph",
+                                    id="div-loss-graph",
                                     className="chart-graph",
                                 ),
                                 html.Div(

@@ -1,7 +1,5 @@
-import sys
-
 from flask import jsonify, make_response, request
-from flask_jwt_extended import get_jwt_identity, get_raw_jwt, jwt_required
+from flask_jwt_extended import get_jwt_identity, jwt_required
 from flask_restful import Resource
 from sqlalchemy import and_
 
@@ -42,8 +40,7 @@ class ModelParams(Resource):
             db_session.add(model_params)
             db_session.commit()
 
-        except:
-            e = sys.exc_info()
+        except Exception as e:
             print(e)
         return jsonify(self.data)
 
@@ -67,8 +64,7 @@ class ModelSummary(Resource):
             )
             db_session.add(model_summary)
             db_session.commit()
-        except:
-            e = sys.exc_info()
+        except Exception as e:
             print(e)
         return jsonify(self.data)
 
@@ -83,8 +79,7 @@ class ModelLayers(Resource):
     def put(self):
         try:
             self.data.update(request.json)
-        except:
-            e = sys.exc_info()
+        except Exception as e:
             print(e)
 
         return jsonify(self.data)
@@ -107,8 +102,7 @@ class TrainingLog(Resource):
             db_session.add(train_log)
             db_session.commit()
 
-        except:
-            e = sys.exc_info()
+        except Exception as e:
             print(e)
 
 
@@ -130,8 +124,7 @@ class ValidationLog(Resource):
             db_session.add(val_log)
             db_session.commit()
 
-        except:
-            e = sys.exc_info()
+        except Exception as e:
             print(e)
 
 
@@ -156,8 +149,7 @@ class Project(Resource):
                     ),
                     401,
                 )
-        except:
-            e = sys.exc_info()
+        except Exception as e:
             print(e)
 
     @jwt_required
@@ -182,8 +174,8 @@ class Project(Resource):
                 )
                 db_session.add(new_project)
                 db_session.commit()
-        except:
-            e = sys.exc_info()
+
+        except Exception as e:
             print(e)
 
 
@@ -197,8 +189,8 @@ class CurrentProject(Resource):
         try:
             self.data.update(request.json)
             return self.data
-        except:
-            e = sys.exc_info()
+
+        except Exception as e:
             print(e)
 
 
@@ -211,7 +203,7 @@ class ClearData(Resource):
         protected_tables = ["projects", "Users"]
         for table in reversed(meta.sorted_tables):
 
-            if str(table.name) not in protected_tables and user != None:
+            if str(table.name) not in protected_tables and user is not None:
                 db_session.execute(
                     table.delete().where(
                         and_(
