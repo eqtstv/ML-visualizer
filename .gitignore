@@ -4,3 +4,4 @@ __pycache__/
 todo.txt
 .coverage
 htmlcov
+run_tests.bat
