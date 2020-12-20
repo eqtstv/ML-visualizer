@@ -12,5 +12,7 @@
 
 Application for visualizing machine learning process parameters
 
+https://live-ml-visualizer.herokuapp.com/
+
 
 ![live](https://user-images.githubusercontent.com/38236287/102703099-05bae380-426b-11eb-9960-a73e386bdca1.gif)
