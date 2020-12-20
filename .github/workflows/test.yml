@@ -20,8 +20,8 @@ jobs:
           pip install -r requirements.txt
       - name: Run Tests
         run: |
-          - python run.py debug &
-          - ./run_tests_travis.bat
+          python run.py debug &
+          python -m unittest discover
 
   linter:
     name: Indentation  Linter
