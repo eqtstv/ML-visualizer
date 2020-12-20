@@ -87,16 +87,11 @@ class TestProjects(unittest.TestCase):
     def test_check_valid_project_invalid_name(self):
         project_name = "no_project"
         project_description = "no project description"
+        msg = {"msg": "Invalid project name!\nDo you want to create new project? (y/n)"}
 
         r = check_valid_project(project_name, project_description)
 
-        self.assertEqual(
-            r.json(),
-            {
-                "msg": "Invalid project name!\n \
-                            Do you want to create new project? (y/n)"
-            },
-        )
+        self.assertEqual(r.json(), msg)
 
     def test_check_create_new_project_valid(self):
         project_name = "myproject"

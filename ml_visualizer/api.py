@@ -131,6 +131,7 @@ class ValidationLog(Resource):
 class Project(Resource):
     @jwt_required
     def post(self):
+        msg = {"msg": "Invalid project name!\nDo you want to create new project? (y/n)"}
         try:
             data = request.json
             selected_project = Projects.query.filter_by(
@@ -141,12 +142,7 @@ class Project(Resource):
                 return make_response(jsonify({"is_valid": True}), 200)
             else:
                 return make_response(
-                    jsonify(
-                        {
-                            "msg": "Invalid project name!\n \
-                            Do you want to create new project? (y/n)"
-                        }
-                    ),
+                    jsonify(msg),
                     401,
                 )
         except Exception as e:
