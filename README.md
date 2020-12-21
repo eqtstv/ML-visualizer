@@ -10,6 +10,7 @@
 ![Tests](https://github.com/eqtstv/ML-visualizer/workflows/Tests/badge.svg?style=flat-square)
 ![CodeQL](https://github.com/eqtstv/ML-visualizer/workflows/CodeQL/badge.svg)
 ![Flake8-black Linter](https://github.com/eqtstv/ML-visualizer/workflows/Flake8-black%20Linter/badge.svg)
+[![codecov](https://codecov.io/gh/eqtstv/ML-visualizer/branch/main/graph/badge.svg?token=OZF0KBA6C8)](https://codecov.io/gh/eqtstv/ML-visualizer)
 
 ![Python](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue?style=flat-square)
 ![Flask](https://img.shields.io/badge/flask-1.1.2-blue?style=flat-square)
