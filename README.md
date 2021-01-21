@@ -59,7 +59,7 @@ model.fit(x=x_train,
 
 4. Follow instructions appearing in the console:
 
-   - Authorize connection with credidentials used on the server
+   - Authorize connection with credentials used on the server
    - Select project name, or create new project
    - After creating new project, it will apprear in your profile page
 
