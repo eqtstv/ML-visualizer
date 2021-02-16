@@ -4,7 +4,7 @@ import unittest
 
 import requests
 import tensorflow as tf
-from callback import (
+from MLV.callback import (
     AuthToken,
     ParametersTracker,
     authenticate_user,
