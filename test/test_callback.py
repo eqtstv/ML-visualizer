@@ -4,7 +4,7 @@ import unittest
 
 import requests
 import tensorflow as tf
-from MLV.callback import (
+from mlvisualizer.callback import (
     AuthToken,
     ParametersTracker,
     authenticate_user,
