@@ -1,157 +1,20 @@
-import json
+import abc
 import sys
 from getpass import getpass
 from timeit import default_timer as timer
 
-import requests
 from tensorflow import keras
 
-# leave it for tests
-# Change it when connecting models
-from ml_visualizer.app import config
-
-URL = f"http://{config['ip']}:{config['port']}"
-
-
-def authenticate_user(email, password):
-    user_data = {
-        "email": email,
-        "password": password,
-    }
-    return requests.post(f"{URL}/auth", json=user_data)
-
-
-def check_valid_project(
-    project_name, project_description="Project added from training"
-):
-    project = {
-        "project_name": str(project_name),
-        "project_description": str(project_description),
-    }
-
-    return requests.post(
-        f"{URL}/project",
-        json=project,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-
-
-def create_new_project(project_name, project_description):
-    project = {
-        "project_name": str(project_name),
-        "project_description": str(project_description),
-    }
-
-    return requests.put(
-        f"{URL}/project",
-        json=project,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-
-
-def write_data_train(
-    project_name,
-    step,
-    batch,
-    train_loss,
-    train_accuracy,
-):
-    train_data = {
-        "project_name": project_name,
-        "step": step,
-        "batch": batch,
-        "train_accuracy": train_accuracy,
-        "train_loss": train_loss,
-    }
-    requests.put(
-        f"{URL}/train",
-        json=train_data,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-
-    return train_data
-
-
-def write_data_val(
-    project_name,
-    step,
-    val_loss,
-    val_accuracy,
-    epoch,
-    epoch_time,
-):
-    val_data = {
-        "project_name": project_name,
-        "step": step,
-        "val_accuracy": val_accuracy,
-        "val_loss": val_loss,
-        "epoch": epoch,
-        "epoch_time": epoch_time,
-    }
-
-    requests.put(
-        f"{URL}/val",
-        json=val_data,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-
-    return val_data
-
-
-def write_model_params(model, param_tracker, project_name):
-    params = {}
-    if param_tracker:
-        params.update(param_tracker.write_parameters())
-        params.update(
-            {
-                "project_name": project_name,
-                "no_tracked_steps": params["epochs"] * params["steps_in_batch"],
-                "total_params": model.count_params(),
-            }
-        )
-
-    requests.put(
-        f"{URL}/params",
-        json=params,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-
-    return params
-
-
-def write_model_summary(model, project_name):
-    model_summary = str(model.to_json())
-    model_summary_json = json.loads(model_summary)
-    model_summary_json.update({"project_name": project_name})
-
-    layer_params = {
-        "layers": [
-            (layer.get_config(), {"no_params": layer.count_params()})
-            for layer in model.layers
-        ]
-    }
-    layer_params.update({"project_name": project_name})
-
-    requests.put(
-        f"{URL}/summary",
-        json=model_summary_json,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-    requests.put(
-        f"{URL}/layers",
-        json=layer_params,
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-    )
-
-    return model_summary_json, layer_params
-
-
-def clear_training_data(project_name):
-    return requests.delete(
-        f"{URL}/clear",
-        headers={"Authorization": f"Bearer {AuthToken.access_token}"},
-        json={"project_name": project_name},
-    )
+from mlvisualizer.utils import (
+    authenticate_user,
+    check_valid_project,
+    clear_training_data,
+    create_new_project,
+    write_data_train,
+    write_data_val,
+    write_model_params,
+    write_model_summary,
+)
 
 
 class Singleton(type):
@@ -192,16 +55,6 @@ class ParametersTracker(metaclass=Singleton):
 
 
 class MLVisualizer(keras.callbacks.Callback):
-    """
-    Connect to MLVisualizer server
-
-    Args:
-        tracking_precision: Tracking precision of your learning process
-
-    Returns:
-        keras.callbacks.Callback
-    """
-
     def __init__(self, tracking_precision=0.01):
         email = input("Email: ")
         password = getpass()
@@ -215,7 +68,9 @@ class MLVisualizer(keras.callbacks.Callback):
             print(f"\n{auth_response.json()['msg']}\n")
             sys.exit()
         check_project_name = str(input("Project name: "))
-        project_response = check_valid_project(check_project_name)
+        project_response = check_valid_project(
+            AuthToken.access_token, check_project_name
+        )
 
         if project_response.status_code == 200:
             print("\nProject selected\n")
@@ -245,16 +100,41 @@ class MLVisualizer(keras.callbacks.Callback):
         self.param_tracker = ParametersTracker(tracking_precision)
         self.step = 0
 
+    @abc.abstractmethod
+    def on_train_begin(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_train_batch_end(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_epoch_begin(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_epoch_end(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_train_end(self):
+        raise NotImplementedError
+
+
+class BatchTracker(MLVisualizer):
     def on_train_begin(self, logs=None):
-        clear_training_data(self.project_name)
+        clear_training_data(AuthToken.access_token, self.project_name)
         self.param_tracker.get_model_parameters(self.params)
 
-        write_model_params(self.model, self.param_tracker, self.project_name)
-        write_model_summary(self.model, self.project_name)
+        write_model_params(
+            AuthToken.access_token, self.model, self.param_tracker, self.project_name
+        )
+        write_model_summary(AuthToken.access_token, self.model, self.project_name)
 
     def on_train_batch_end(self, batch, logs=None):
         if batch % self.param_tracker.batch_split == 0:
             write_data_train(
+                AuthToken.access_token,
                 self.project_name,
                 self.step,
                 batch,
@@ -271,6 +151,7 @@ class MLVisualizer(keras.callbacks.Callback):
         self.stop = timer()
         if "val_loss" in logs.keys():
             write_data_val(
+                AuthToken.access_token,
                 self.project_name,
                 self.step,
                 logs["val_accuracy"],
@@ -281,6 +162,7 @@ class MLVisualizer(keras.callbacks.Callback):
 
     def on_train_end(self, logs=None):
         write_data_train(
+            AuthToken.access_token,
             self.project_name,
             self.step,
             self.param_tracker.batch_split * (self.param_tracker.steps_in_batch - 1),
@@ -289,6 +171,7 @@ class MLVisualizer(keras.callbacks.Callback):
         )
         if "val_loss" in logs.keys():
             write_data_val(
+                AuthToken.access_token,
                 self.project_name,
                 self.step,
                 logs["val_accuracy"],
@@ -296,3 +179,25 @@ class MLVisualizer(keras.callbacks.Callback):
                 self.epoch,
                 0,
             )
+
+
+class EpochTracker(MLVisualizer):
+    @abc.abstractmethod
+    def on_train_begin(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_train_batch_end(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_epoch_begin(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_epoch_end(self):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def on_train_end(self):
+        raise NotImplementedError

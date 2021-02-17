@@ -89,7 +89,9 @@ class TestProjects(unittest.TestCase):
         project_description = "no project description"
         msg = {"msg": "Invalid project name!\nDo you want to create new project? (y/n)"}
 
-        r = check_valid_project(project_name, project_description)
+        r = check_valid_project(
+            AuthToken.access_token, project_name, project_description
+        )
 
         self.assertEqual(r.json(), msg)
 
@@ -97,7 +99,9 @@ class TestProjects(unittest.TestCase):
         project_name = "myproject"
         project_description = "myproject description"
 
-        r = create_new_project(project_name, project_description)
+        r = create_new_project(
+            AuthToken.access_token, project_name, project_description
+        )
         self.assertEqual(r.status_code, 200)
         clear_data()
 
@@ -110,7 +114,7 @@ class TestClearData(unittest.TestCase):
         AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
             "access_token"
         ]
-        r = clear_training_data("my_project")
+        r = clear_training_data(AuthToken.access_token, "my_project")
         self.assertEqual(r.status_code, 200)
         clear_data()
 
@@ -140,7 +144,9 @@ class TestCallback(unittest.TestCase):
         ]
 
         # WHEN write_data_train() is ran with that input
-        result = write_data_train(project, step, batch, train_loss, train_accuracy)
+        result = write_data_train(
+            AuthToken.access_token, project, step, batch, train_loss, train_accuracy
+        )
 
         # THEN function should return valid dictionary
         self.assertDictEqual(result, valid_dict)
@@ -172,7 +178,13 @@ class TestCallback(unittest.TestCase):
         ]
         # WHEN write_data_val() is ran with that input
         result = write_data_val(
-            project, step, val_loss, val_accuracy, epoch, epoch_time
+            AuthToken.access_token,
+            project,
+            step,
+            val_loss,
+            val_accuracy,
+            epoch,
+            epoch_time,
         )
 
         # THEN function should return valid dictionary
@@ -218,7 +230,9 @@ class TestCallback(unittest.TestCase):
         param_tracker.get_model_parameters(inputs)
 
         # WHEN write_model_params() is ran with that input
-        result = write_model_params(model, param_tracker, project)
+        result = write_model_params(
+            AuthToken.access_token, model, param_tracker, project
+        )
 
         # THEN it should return valid dictionary
         valid_dict = {
@@ -242,7 +256,7 @@ class TestCallback(unittest.TestCase):
         project_name = "my_project"
 
         # WHEN write_model_summary() is ran with that input
-        result = write_model_summary(model, project_name)
+        result = write_model_summary(AuthToken.access_token, model, project_name)
 
         # THEN is should return valid model summary
         model_summary = str(model.to_json())
