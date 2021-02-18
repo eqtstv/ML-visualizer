@@ -2,12 +2,14 @@ import json
 import os
 import unittest
 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import requests
 import tensorflow as tf
 from ml_visualizer.app import config
 from ml_visualizer.database import Base, db_session
 from mlvisualizer.callback import (
     AuthToken,
+    MLVisualizer,
     ParametersTracker,
     authenticate_user,
     check_valid_project,
@@ -19,8 +21,7 @@ from mlvisualizer.callback import (
     write_model_params,
     write_model_summary,
 )
-
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+from mlvisualizer.utils import Target as TestTarget
 
 choose_target("local")
 
@@ -265,6 +266,15 @@ class TestCallback(unittest.TestCase):
         self.assertEqual(result[1].keys(), valid_model_layers.keys())
         clear_data()
 
+
+class TestMLVInit(unittest.TestCase):
+    def test_choose_target_cloud(self):
+        choose_target("cloud")
+        self.assertEqual(TestTarget.url, "https://live-ml-visualizer.herokuapp.com")
+
+    def test_choose_target_local(self):
+        choose_target("local")
+        self.assertEqual(TestTarget.url, "http://127.0.0.1:5000")
 
 if __name__ == "__main__":
     unittest.main()
