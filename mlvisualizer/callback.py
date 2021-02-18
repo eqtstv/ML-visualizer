@@ -14,6 +14,7 @@ from mlvisualizer.utils import (
     write_data_val,
     write_model_params,
     write_model_summary,
+    choose_target,
 )
 
 
@@ -56,6 +57,9 @@ class ParametersTracker(metaclass=Singleton):
 
 class MLVisualizer(keras.callbacks.Callback):
     def __init__(self, tracking_precision=0.01):
+        target = input("Choose target (local/cloud): ")
+        choose_target(target)
+
         email = input("Email: ")
         password = getpass()
 
@@ -89,15 +93,15 @@ class MLVisualizer(keras.callbacks.Callback):
             if project_response.status_code == 200:
                 print("\nProject successfully created.\n")
                 self.project_name = new_name
-                print("Start training? y/n")
-                decide = input()
-
-                if decide != "y":
-                    sys.exit()
-
             else:
                 print(f"\n{project_response.json()['msg']}\n")
                 sys.exit()
+
+        print("Start training? y/n")
+        decide = input()
+
+        if decide != "y":
+            sys.exit()
 
         self.param_tracker = ParametersTracker(tracking_precision)
         self.step = 0

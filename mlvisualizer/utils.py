@@ -3,7 +3,26 @@ import json
 import requests
 from ml_visualizer.app import config
 
-URL = f"http://{config['ip']}:{config['port']}"
+
+class Singleton(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+
+class Target(metaclass=Singleton):
+    def __init__(self, url):
+        self.url = url
+
+
+def choose_target(target):
+    if target == "local":
+        Target.url = f"http://{config['ip']}:{config['port']}"
+    if target == "cloud":
+        Target.url = "https://live-ml-visualizer.herokuapp.com"
 
 
 def authenticate_user(email, password):
@@ -11,7 +30,7 @@ def authenticate_user(email, password):
         "email": email,
         "password": password,
     }
-    return requests.post(f"{URL}/auth", json=user_data)
+    return requests.post(f"{Target.url}/auth", json=user_data)
 
 
 def check_valid_project(
@@ -23,7 +42,7 @@ def check_valid_project(
     }
 
     return requests.post(
-        f"{URL}/project",
+        f"{Target.url}/project",
         json=project,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
@@ -36,7 +55,7 @@ def create_new_project(auth_token, project_name, project_description):
     }
 
     return requests.put(
-        f"{URL}/project",
+        f"{Target.url}/project",
         json=project,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
@@ -58,7 +77,7 @@ def write_data_train(
         "train_loss": train_loss,
     }
     requests.put(
-        f"{URL}/train",
+        f"{Target.url}/train",
         json=train_data,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
@@ -85,7 +104,7 @@ def write_data_val(
     }
 
     requests.put(
-        f"{URL}/val",
+        f"{Target.url}/val",
         json=val_data,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
@@ -106,7 +125,7 @@ def write_model_params(auth_token, model, param_tracker, project_name):
         )
 
     requests.put(
-        f"{URL}/params",
+        f"{Target.url}/params",
         json=params,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
@@ -128,12 +147,12 @@ def write_model_summary(auth_token, model, project_name):
     layer_params.update({"project_name": project_name})
 
     requests.put(
-        f"{URL}/summary",
+        f"{Target.url}/summary",
         json=model_summary_json,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
     requests.put(
-        f"{URL}/layers",
+        f"{Target.url}/layers",
         json=layer_params,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
@@ -143,7 +162,7 @@ def write_model_summary(auth_token, model, project_name):
 
 def clear_training_data(auth_token, project_name):
     return requests.delete(
-        f"{URL}/clear",
+        f"{Target.url}/clear",
         headers={"Authorization": f"Bearer {auth_token}"},
         json={"project_name": project_name},
     )

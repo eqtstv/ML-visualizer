@@ -15,11 +15,14 @@ from mlvisualizer.callback import (
     write_data_val,
     write_model_params,
     write_model_summary,
+    choose_target,
 )
 from ml_visualizer.app import config
 from ml_visualizer.database import Base, db_session
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
+choose_target("local")
 
 
 def clear_data():
