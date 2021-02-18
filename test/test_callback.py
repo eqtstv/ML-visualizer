@@ -88,7 +88,6 @@ class TestProjects(unittest.TestCase):
     def test_check_valid_project_invalid_name(self):
         project_name = "no_project"
         project_description = "no project description"
-        msg = {"msg": "Invalid project name!\nDo you want to create new project? (y/n)"}
 
         r = check_valid_project(
             AuthToken.access_token, project_name, project_description
