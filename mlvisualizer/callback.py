@@ -4,7 +4,6 @@ import sys
 from getpass import getpass
 from timeit import default_timer as timer
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 from tensorflow import keras
 
 from mlvisualizer.utils import (
@@ -18,6 +17,8 @@ from mlvisualizer.utils import (
     write_model_params,
     write_model_summary,
 )
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
 
 class Singleton(type):

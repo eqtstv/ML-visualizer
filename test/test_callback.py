@@ -2,7 +2,6 @@ import json
 import os
 import unittest
 
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 import requests
 import tensorflow as tf
 from ml_visualizer.app import config
@@ -23,6 +22,7 @@ from mlvisualizer.callback import (
 )
 from mlvisualizer.utils import Target as TestTarget
 
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 choose_target("local")
 
 
@@ -275,6 +275,7 @@ class TestMLVInit(unittest.TestCase):
     def test_choose_target_local(self):
         choose_target("local")
         self.assertEqual(TestTarget.url, "http://127.0.0.1:5000")
+
 
 if __name__ == "__main__":
     unittest.main()
