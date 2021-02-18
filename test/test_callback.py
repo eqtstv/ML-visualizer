@@ -8,7 +8,6 @@ from ml_visualizer.app import config
 from ml_visualizer.database import Base, db_session
 from mlvisualizer.callback import (
     AuthToken,
-    MLVisualizer,
     ParametersTracker,
     authenticate_user,
     check_valid_project,
