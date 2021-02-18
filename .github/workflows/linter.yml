@@ -20,4 +20,4 @@ jobs:
           python -m pip install flake8-black
       - name: Lint with flake8-black
         run: |
-          flake8 ml_visualizer test callback.py
+          flake8 ml_visualizer test mlvisualizer

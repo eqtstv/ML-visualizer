@@ -4,11 +4,14 @@ import unittest
 
 import requests
 import tensorflow as tf
-from callback import (
+from ml_visualizer.app import config
+from ml_visualizer.database import Base, db_session
+from mlvisualizer.callback import (
     AuthToken,
     ParametersTracker,
     authenticate_user,
     check_valid_project,
+    choose_target,
     clear_training_data,
     create_new_project,
     write_data_train,
@@ -16,10 +19,10 @@ from callback import (
     write_model_params,
     write_model_summary,
 )
-from ml_visualizer.app import config
-from ml_visualizer.database import Base, db_session
+from mlvisualizer.utils import Target as TestTarget
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+choose_target("local")
 
 
 def clear_data():
@@ -74,9 +77,7 @@ class TestAuth(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
 
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(AuthToken.access_token), 283)
@@ -87,18 +88,18 @@ class TestProjects(unittest.TestCase):
     def test_check_valid_project_invalid_name(self):
         project_name = "no_project"
         project_description = "no project description"
-        msg = {"msg": "Invalid project name!\nDo you want to create new project? (y/n)"}
 
-        r = check_valid_project(project_name, project_description)
+        r = check_valid_project(
+            AuthToken.access_token, project_name, project_description
+        )
 
-        self.assertEqual(r.json(), msg)
+        self.assertEqual(r, False)
 
-    def test_check_create_new_project_valid(self):
-        project_name = "myproject"
-        project_description = "myproject description"
+    @unittest.mock.patch("builtins.input", return_value="myproject")
+    def test_check_create_new_project_valid(self, project_name):
+        r = create_new_project(AuthToken.access_token)
 
-        r = create_new_project(project_name, project_description)
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r, "myproject")
         clear_data()
 
 
@@ -107,10 +108,9 @@ class TestClearData(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
-        r = clear_training_data("my_project")
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
+
+        r = clear_training_data(AuthToken.access_token, "my_project")
         self.assertEqual(r.status_code, 200)
         clear_data()
 
@@ -135,12 +135,12 @@ class TestCallback(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
 
         # WHEN write_data_train() is ran with that input
-        result = write_data_train(project, step, batch, train_loss, train_accuracy)
+        result = write_data_train(
+            AuthToken.access_token, project, step, batch, train_loss, train_accuracy
+        )
 
         # THEN function should return valid dictionary
         self.assertDictEqual(result, valid_dict)
@@ -167,12 +167,16 @@ class TestCallback(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
         # WHEN write_data_val() is ran with that input
         result = write_data_val(
-            project, step, val_loss, val_accuracy, epoch, epoch_time
+            AuthToken.access_token,
+            project,
+            step,
+            val_loss,
+            val_accuracy,
+            epoch,
+            epoch_time,
         )
 
         # THEN function should return valid dictionary
@@ -192,9 +196,8 @@ class TestCallback(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
+
         valid_dict = {
             "tracking_precision": 0.01,
             "no_steps": 1000,
@@ -218,7 +221,9 @@ class TestCallback(unittest.TestCase):
         param_tracker.get_model_parameters(inputs)
 
         # WHEN write_model_params() is ran with that input
-        result = write_model_params(model, param_tracker, project)
+        result = write_model_params(
+            AuthToken.access_token, model, param_tracker, project
+        )
 
         # THEN it should return valid dictionary
         valid_dict = {
@@ -242,7 +247,7 @@ class TestCallback(unittest.TestCase):
         project_name = "my_project"
 
         # WHEN write_model_summary() is ran with that input
-        result = write_model_summary(model, project_name)
+        result = write_model_summary(AuthToken.access_token, model, project_name)
 
         # THEN is should return valid model summary
         model_summary = str(model.to_json())
@@ -259,6 +264,16 @@ class TestCallback(unittest.TestCase):
 
         self.assertEqual(result[1].keys(), valid_model_layers.keys())
         clear_data()
+
+
+class TestMLVInit(unittest.TestCase):
+    def test_choose_target_cloud(self):
+        choose_target("cloud")
+        self.assertEqual(TestTarget.url, "https://live-ml-visualizer.herokuapp.com")
+
+    def test_choose_target_local(self):
+        choose_target("local")
+        self.assertEqual(TestTarget.url, "http://127.0.0.1:5000")
 
 
 if __name__ == "__main__":
