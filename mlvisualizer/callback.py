@@ -8,13 +8,13 @@ from tensorflow import keras
 from mlvisualizer.utils import (
     authenticate_user,
     check_valid_project,
+    choose_target,
     clear_training_data,
     create_new_project,
     write_data_train,
     write_data_val,
     write_model_params,
     write_model_summary,
-    choose_target,
 )
 
 
