@@ -1,8 +1,8 @@
 .vscode/
 __pycache__/
+.pytest_cache
 *.db
 todo.txt
 .coverage
 htmlcov
 run_tests.bat
-local
