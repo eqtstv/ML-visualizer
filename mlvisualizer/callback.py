@@ -82,7 +82,9 @@ class MLVisualizer(keras.callbacks.Callback):
             if decide == "y":
                 new_name = input("Project name: ")
                 new_description = input("Project description: ")
-                project_response = create_new_project(new_name, new_description)
+                project_response = create_new_project(
+                    AuthToken.access_token, new_name, new_description
+                )
 
             if project_response.status_code == 200:
                 print("\nProject successfully created.\n")
