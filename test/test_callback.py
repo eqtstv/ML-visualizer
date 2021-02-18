@@ -4,21 +4,21 @@ import unittest
 
 import requests
 import tensorflow as tf
+from ml_visualizer.app import config
+from ml_visualizer.database import Base, db_session
 from mlvisualizer.callback import (
     AuthToken,
     ParametersTracker,
     authenticate_user,
     check_valid_project,
+    choose_target,
     clear_training_data,
     create_new_project,
     write_data_train,
     write_data_val,
     write_model_params,
     write_model_summary,
-    choose_target,
 )
-from ml_visualizer.app import config
-from ml_visualizer.database import Base, db_session
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
 
@@ -77,9 +77,7 @@ class TestAuth(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
 
         self.assertEqual(r.status_code, 200)
         self.assertEqual(len(AuthToken.access_token), 283)
@@ -96,16 +94,13 @@ class TestProjects(unittest.TestCase):
             AuthToken.access_token, project_name, project_description
         )
 
-        self.assertEqual(r.json(), msg)
+        self.assertEqual(r, False)
 
-    def test_check_create_new_project_valid(self):
-        project_name = "myproject"
-        project_description = "myproject description"
+    @unittest.mock.patch("builtins.input", return_value="myproject")
+    def test_check_create_new_project_valid(self, project_name):
+        r = create_new_project(AuthToken.access_token)
 
-        r = create_new_project(
-            AuthToken.access_token, project_name, project_description
-        )
-        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r, "myproject")
         clear_data()
 
 
@@ -114,9 +109,8 @@ class TestClearData(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         r = requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
+
         r = clear_training_data(AuthToken.access_token, "my_project")
         self.assertEqual(r.status_code, 200)
         clear_data()
@@ -142,9 +136,7 @@ class TestCallback(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
 
         # WHEN write_data_train() is ran with that input
         result = write_data_train(
@@ -176,9 +168,7 @@ class TestCallback(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
         # WHEN write_data_val() is ran with that input
         result = write_data_val(
             AuthToken.access_token,
@@ -207,9 +197,8 @@ class TestCallback(unittest.TestCase):
         user = {"email": "asd@asd.pl", "name": "asd", "password": "asd"}
         requests.put(f"http://{config['ip']}:{config['port']}/signup", json=user)
 
-        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd").json()[
-            "access_token"
-        ]
+        AuthToken.access_token = authenticate_user("asd@asd.pl", "asd")
+
         valid_dict = {
             "tracking_precision": 0.01,
             "no_steps": 1000,

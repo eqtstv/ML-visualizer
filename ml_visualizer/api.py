@@ -131,7 +131,7 @@ class ValidationLog(Resource):
 class Project(Resource):
     @jwt_required
     def post(self):
-        msg = {"msg": "Invalid project name!\nDo you want to create new project? (y/n)"}
+        msg = {"msg": "Invalid project name!"}
         try:
             data = request.json
             selected_project = Projects.query.filter_by(

@@ -62,39 +62,19 @@ class MLVisualizer(keras.callbacks.Callback):
 
         email = input("Email: ")
         password = getpass()
+        AuthToken.access_token = authenticate_user(email, password)
 
-        auth_response = authenticate_user(email, password)
-
-        if "access_token" in auth_response.json():
-            AuthToken.access_token = auth_response.json()["access_token"]
-            print("\nAuthentication successful.\n")
-        else:
-            print(f"\n{auth_response.json()['msg']}\n")
-            sys.exit()
         check_project_name = str(input("Project name: "))
-        project_response = check_valid_project(
-            AuthToken.access_token, check_project_name
-        )
 
-        if project_response.status_code == 200:
-            print("\nProject selected\n")
+        if check_valid_project(AuthToken.access_token, check_project_name):
             self.project_name = check_project_name
         else:
-            print(f"\n{project_response.json()['msg']}\n")
+            print("Do you want to create new project? (y/n)")
             decide = input()
 
             if decide == "y":
-                new_name = input("Project name: ")
-                new_description = input("Project description: ")
-                project_response = create_new_project(
-                    AuthToken.access_token, new_name, new_description
-                )
-
-            if project_response.status_code == 200:
-                print("\nProject successfully created.\n")
-                self.project_name = new_name
+                self.project_name = create_new_project(AuthToken.access_token)
             else:
-                print(f"\n{project_response.json()['msg']}\n")
                 sys.exit()
 
         print("Start training? y/n")

@@ -1,4 +1,5 @@
 import json
+import sys
 
 import requests
 from ml_visualizer.app import config
@@ -30,7 +31,14 @@ def authenticate_user(email, password):
         "email": email,
         "password": password,
     }
-    return requests.post(f"{Target.url}/auth", json=user_data)
+    auth_response = requests.post(f"{Target.url}/auth", json=user_data)
+
+    if "access_token" in auth_response.json():
+        print("\nAuthentication successful.\n")
+        return auth_response.json()["access_token"]
+    else:
+        print(f"\n{auth_response.json()['msg']}\n")
+        sys.exit()
 
 
 def check_valid_project(
@@ -41,24 +49,41 @@ def check_valid_project(
         "project_description": str(project_description),
     }
 
-    return requests.post(
+    project_response = requests.post(
         f"{Target.url}/project",
         json=project,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
 
+    if project_response.status_code == 200:
+        print("\nProject selected\n")
+        return project_name
+    else:
+        print(f"\n{project_response.json()['msg']}\n")
+        return False
 
-def create_new_project(auth_token, project_name, project_description):
+
+def create_new_project(auth_token):
+    new_name = input("Project name: ")
+    new_description = input("Project description: ")
+
     project = {
-        "project_name": str(project_name),
-        "project_description": str(project_description),
+        "project_name": str(new_name),
+        "project_description": str(new_description),
     }
 
-    return requests.put(
+    project_response = requests.put(
         f"{Target.url}/project",
         json=project,
         headers={"Authorization": f"Bearer {auth_token}"},
     )
+
+    if project_response.status_code == 200:
+        print("\nProject successfully created.\n")
+        return new_name
+    else:
+        print(f"\n{project_response.json()['msg']}\n")
+        sys.exit()
 
 
 def write_data_train(
