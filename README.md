@@ -30,12 +30,12 @@ https://live-ml-visualizer.herokuapp.com/
 
 2. Configure the client:
 
-- Download and place client file `callback.py` next to your ML model.
+- Download and place client folder `mlvisualizer` next to your ML model.
 
-- Import MLVisualizer instance to your code (1) and add it to the list of callbacks (2).
+- Import BatchTracker instance to your code (1) and add it to the list of callbacks (2).
 
 ```python
-from callback import BatchTracker                           (1)
+from mlvisualizer.callback import BatchTracker              (1)
 ...
 
 model = create_model()
