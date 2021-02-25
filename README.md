@@ -35,7 +35,7 @@ https://live-ml-visualizer.herokuapp.com/
 - Import MLVisualizer instance to your code (1) and add it to the list of callbacks (2).
 
 ```python
-from callback import MLVisualizer                           (1)
+from callback import BatchTracker                           (1)
 ...
 
 model = create_model()
