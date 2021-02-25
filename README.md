@@ -48,7 +48,7 @@ model.fit(x=x_train,
           y=y_train,
           epochs=5,
           validation_data=(x_test, y_test),
-          callbacks=[MLVisualizer()])                       (2)
+          callbacks=[BatchTracker()])                       (2)
 ```
 
 3. Run your ML model file.
