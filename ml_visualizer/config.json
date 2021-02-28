@@ -1,5 +1,5 @@
 {
   "ip": "127.0.0.1",
   "port": "5000",
-  "secret_key": ${{ secrets.SECRET_KEY }}
+  "secret_key": "f1ccae4fee0aa55579ac14295570f082"
 }
