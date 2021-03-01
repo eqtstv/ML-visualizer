@@ -282,9 +282,11 @@ def update_progress_display(run_log_json, model_params):
 
             epochs_div = html.P(f"Epoch: {1:.0f} / {model_params['epochs']['0']}")
 
-            tracking_precision = html.P(
-                f"Tracking precision: {model_params['tracking_precision']['0']}"
-            )
+            if model_params["tracking_precision"]["0"] == -1:
+                precision_text = "Epoch"
+            else:
+                precision_text = model_params["tracking_precision"]["0"]
+            tracking_precision = html.P(f"Tracking precision: {precision_text}")
 
         if run_log_df["epoch"].last_valid_index() and model_params:
             last_val_index = run_log_df["epoch"].last_valid_index()
